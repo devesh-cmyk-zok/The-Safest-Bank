@@ -1,0 +1,171 @@
+{
+  "name": "The-Safest-Bank",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fraud-alert",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cd7500b5-5d75-4eb1-bca5-a1182e5a9eaa",
+      "name": "Webhook",
+      "webhookId": "da4821a8-a560-4523-abe6-d394a9965d56"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.decision }}",
+                    "rightValue": "ESCROW_HELD",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ef4a2712-0ba0-4985-9f85-374e03df8e7c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Escrow Quarantine"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1bc02480-6d7c-42f3-b450-3504d137f35f",
+                    "leftValue": "={{ $json.body.decision }}",
+                    "rightValue": "AUTO_ABORT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Auto Abort"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "aa4c7c47-0d51-40f9-9fde-eff787f7d476",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "sendTo": "deveshingale@gmail.com",
+        "subject": "=🚨 Verification Required for Transaction {{ $json.body.transaction_id }}",
+        "message": "=Hello,  A transaction of ₹{{ $json.body.amount }} has been held in Escrow for your safety.  Verification OTP Code: {{ $json.body.otp_code }}  Reason: {{ $json.body.user_message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "1addc8a8-83ce-4f77-95ef-cb6032d96c21",
+      "name": "Send a message",
+      "webhookId": "0d357faf-eba7-496d-9788-6fe0d004a4d6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eGiwUnzBN1e3cCwO",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://discord.com/api/webhooks/1552252491788197900/JNoi56K0fF1j_sYTMm3zbc4kFHIqbrs6f-fc8AARi2yaFwmo66IApRs5S3F16Vw0vdjx",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"🚨 **Fraud Alert Triggered!**\\n**Transaction ID:** {{ $json.body.transaction_id }}\\n**Decision:** {{ $json.body.decision }}\\n**Risk Score:** {{ $json.body.risk_score }}\\n**OTP Code:** {{ $json.body.otp_code }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        416,
+        96
+      ],
+      "id": "fb9cf0b6-a57a-4228-8dd9-84e44463f7ca",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "76e13e12-5c25-4783-9c47-a4ba5e2f9e0e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "30a09f913bc2e75c2faeda1b725b58d3945e688b0435660a1180c1e396c19d60"
+  },
+  "id": "C9b22idqcOS5BOju",
+  "tags": []
+}
