@@ -1,0 +1,69 @@
+{% extends "soc/base_soc.html" %}
+{% block title %}Audit Logs — SOC{% endblock %}
+{% block page_title %}Audit Logs{% endblock %}
+{% block page_sub %}Complete analyst action history · tamper-evident log{% endblock %}
+
+{% block content %}
+
+<div class="soc-card">
+  <div class="soc-card-header">
+    <div>
+      <div class="soc-card-title">Analyst Activity Log</div>
+      <div class="soc-card-sub">{{ logs|length }} entries</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <div class="soc-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="soc-input" placeholder="Search logs…" oninput="filterLogs(this.value)">
+      </div>
+      <button class="soc-btn soc-btn-ghost soc-btn-sm">Export CSV</button>
+    </div>
+  </div>
+  <div class="soc-table-wrap" style="overflow-x:auto;">
+    <table class="soc-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Analyst</th>
+          <th>Action</th>
+          <th>Transaction</th>
+          <th>Case</th>
+          <th>Result</th>
+          <th>IP / Session</th>
+        </tr>
+      </thead>
+      <tbody id="logTableBody">
+        {% for log in logs %}
+        <tr data-search="{{ log.action|lower }} {{ log.analyst|lower }} {{ log.transaction_id|lower }}">
+          <td class="soc-log-time">{{ log.timestamp }}</td>
+          <td style="font-weight:500;">{{ log.analyst }}</td>
+          <td class="soc-log-action">{{ log.action }}</td>
+          <td class="soc-log-txn">{% if log.transaction_id %}{{ log.transaction_id }}{% else %}<span style="color:var(--soc-text-dim);">—</span>{% endif %}</td>
+          <td class="soc-log-txn" style="color:var(--soc-purple);">{% if log.case_id %}{{ log.case_id }}{% else %}<span style="color:var(--soc-text-dim);">—</span>{% endif %}</td>
+          <td>
+            <span class="soc-badge {% if log.result == 'Successful' %}low{% elif log.result == 'No Action' %}pending{% else %}medium{% endif %}">
+              {{ log.result }}
+            </span>
+          </td>
+          <td style="font-size:11px;color:var(--soc-text-muted);font-family:monospace;">{{ log.ip_address }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="soc-empty">No audit entries found</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterLogs(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('#logTableBody tr[data-search]').forEach(row => {
+    row.style.display = (row.dataset.search || '').includes(q) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

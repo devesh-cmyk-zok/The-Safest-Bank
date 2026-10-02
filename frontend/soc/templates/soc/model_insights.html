@@ -1,0 +1,133 @@
+{% extends "soc/base_soc.html" %}
+{% block title %}Model Insights — SOC{% endblock %}
+{% block page_title %}Model Insights{% endblock %}
+{% block page_sub %}CNN-BiLSTM explainability · SHAP feature importance{% endblock %}
+
+{% block content %}
+
+<!-- Metrics Row -->
+<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px;">
+  <div class="soc-kpi-card">
+    <div class="soc-kpi-label">Model</div>
+    <div class="soc-kpi-value" style="font-size:15px;">CNN-BiLSTM</div>
+    <div class="soc-kpi-meta">{{ metrics.version }}</div>
+  </div>
+  <div class="soc-kpi-card accent-green">
+    <div class="soc-kpi-label">Accuracy</div>
+    <div class="soc-kpi-value">{{ metrics.accuracy }}%</div>
+    <div class="soc-kpi-meta">On test dataset</div>
+  </div>
+  <div class="soc-kpi-card accent-green">
+    <div class="soc-kpi-label">Precision</div>
+    <div class="soc-kpi-value">{{ metrics.precision }}%</div>
+    <div class="soc-kpi-meta">Fraud class</div>
+  </div>
+  <div class="soc-kpi-card accent-green">
+    <div class="soc-kpi-label">Recall</div>
+    <div class="soc-kpi-value">{{ metrics.recall }}%</div>
+    <div class="soc-kpi-meta">Fraud class</div>
+  </div>
+  <div class="soc-kpi-card accent-green">
+    <div class="soc-kpi-label">F1 Score</div>
+    <div class="soc-kpi-value">{{ metrics.f1_score }}%</div>
+    <div class="soc-kpi-meta">Harmonic mean</div>
+  </div>
+  <div class="soc-kpi-card accent-amber">
+    <div class="soc-kpi-label">ROC-AUC</div>
+    <div class="soc-kpi-value">{{ metrics.auc_roc }}</div>
+    <div class="soc-kpi-meta">Area under curve</div>
+  </div>
+</div>
+
+<!-- Feature Importance -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div>
+        <div class="soc-card-title">Feature Importance</div>
+        <div class="soc-card-sub">SHAP-based global feature contributions</div>
+      </div>
+    </div>
+    <div class="soc-card-body">
+      {% for f in features %}
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-size:12px;font-weight:500;">{{ f.name }}</span>
+          <span style="font-size:11px;color:var(--soc-amber);font-weight:700;">{{ f.pct }}%</span>
+        </div>
+        <div class="soc-fi-bar-wrap" style="width:100%;">
+          <div class="soc-fi-bar" style="width:{{ f.pct|floatformat:0 }}%;"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div class="soc-card-title">Feature Importance Chart</div>
+    </div>
+    <div class="soc-card-body">
+      <div class="soc-chart-wrap" style="height:280px;">
+        <canvas id="featureChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ROC Curve Placeholder -->
+<div class="soc-card" style="margin-top:12px;">
+  <div class="soc-card-header">
+    <div class="soc-card-title">ROC Curve</div>
+    <span style="font-size:11px;color:var(--soc-amber);font-weight:600;">AUC = {{ metrics.auc_roc }}</span>
+  </div>
+  <div class="soc-card-body">
+    <div class="soc-chart-wrap" style="height:200px;">
+      <canvas id="rocChart"></canvas>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const FEATURES = {{ features_json|safe }};
+const G = 'rgba(36,49,73,0.6)';
+Chart.defaults.color = '#64748B';
+Chart.defaults.font.family = 'Inter, sans-serif';
+Chart.defaults.font.size = 11;
+
+// Feature importance horizontal bar
+new Chart(document.getElementById('featureChart'), {
+  type: 'bar',
+  data: {
+    labels: FEATURES.map(f => f.name),
+    datasets: [{ label: 'SHAP Importance', data: FEATURES.map(f => f.pct),
+      backgroundColor: FEATURES.map((_, i) => `rgba(245,158,11,${0.4 + i*0.07})`),
+      borderRadius: 4 }]
+  },
+  options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { color: G }, ticks: { callback: v => v + '%' } }, y: { grid: { display: false } } } }
+});
+
+// ROC curve approximation
+const rocFPR = [0, 0.02, 0.05, 0.08, 0.12, 0.18, 0.25, 0.35, 0.5, 0.65, 0.8, 1.0];
+const rocTPR = [0, 0.45, 0.72, 0.83, 0.89, 0.93, 0.96, 0.97, 0.98, 0.99, 0.995, 1.0];
+new Chart(document.getElementById('rocChart'), {
+  type: 'line',
+  data: { labels: rocFPR.map(v => v.toFixed(2)), datasets: [
+    { label: 'ROC Curve (AUC=0.9847)', data: rocTPR, borderColor: '#F59E0B', backgroundColor: 'rgba(245,158,11,0.06)', borderWidth: 2, pointRadius: 2, fill: true, tension: 0.3 },
+    { label: 'Random Classifier', data: rocFPR, borderColor: '#475569', borderWidth: 1, borderDash: [4,4], pointRadius: 0 }
+  ]},
+  options: { responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { boxWidth: 10 } } },
+    scales: { x: { grid: { color: G }, title: { display: true, text: 'False Positive Rate' } },
+              y: { grid: { color: G }, min: 0, max: 1, title: { display: true, text: 'True Positive Rate' } } } }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}THE SAFEST BANK — Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'portal/css/transfer.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="trust-pulse" id="trustPulse"></div>
+
+<div class="shell">
+  <!-- Mobile top header (hamburger trigger) -->
+  <div class="mobile-topbar" id="mobileTopbar">
+    <div class="mobile-brand">
+      <img src="{% static 'portal/images/logo.jpeg' %}" alt="The Safest Bank" class="brand-logo-img" style="width:34px;height:34px;">
+      <span>THE SAFEST BANK</span>
+    </div>
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="brand">
+        <img src="{% static 'portal/images/logo.jpeg' %}" alt="The Safest Bank" class="brand-logo-img">
+        <div class="name">THE SAFEST BANK<small>AI-powered protection</small></div>
+      </div>
+      <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="nav-scroll">
+      <div class="nav-label">Main</div>
+      <nav class="nav">
+        <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+          data-tip="Overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="9" rx="1.5" />
+            <rect x="14" y="3" width="7" height="5" rx="1.5" />
+            <rect x="14" y="12" width="7" height="9" rx="1.5" />
+            <rect x="3" y="16" width="7" height="5" rx="1.5" />
+          </svg>
+          <span>Overview</span>
+        </a>
+        <a href="{% url 'transfer' %}" class="{% if request.resolver_match.url_name == 'transfer' %}active{% endif %}"
+          data-tip="Transfers">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 8l4 4-4 4M3 12h18" />
+          </svg>
+          <span>Transfers</span>
+        </a>
+        <a href="{% url 'transactions' %}"
+          class="{% if request.resolver_match.url_name == 'transactions' %}active{% endif %}" data-tip="Transactions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 3h8l3 3v15H7z" />
+            <path d="M10 8h4M10 12h4M10 16h2" />
+          </svg>
+          <span>Transactions</span>
+        </a>
+        <a href="{% url 'accounts' %}" class="{% if request.resolver_match.url_name == 'accounts' %}active{% endif %}"
+          data-tip="Accounts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="17" rx="2" />
+            <path d="M3 9h18M8 4v5M16 4v5" />
+          </svg>
+          <span>Accounts</span>
+        </a>
+        <a href="{% url 'fraud_shield' %}"
+          class="{% if request.resolver_match.url_name == 'fraud_shield' %}active{% endif %}" data-tip="Fraud Shield">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z" />
+          </svg>
+          <span>Fraud Shield</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="profile-block">
+      <div class="avatar">PS</div>
+      <div>
+        <div class="pname">Priya Sharma</div>
+        <div class="prole">Personal Account</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <div class="content-area">
+    <header class="topbar">
+      <div class="greet">
+        <h1>Good afternoon, Priya 👋</h1>
+        <p>Here's what's happening with your account today.</p>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M21 21l-4.3-4.3" />
+          </svg>
+        </button>
+        <button class="icon-btn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 8a6 6 0 1112 0c0 4 1.5 5.5 2 6.5H4c.5-1 2-2.5 2-6.5z" />
+            <path d="M9.5 18a2.5 2.5 0 005 0" />
+          </svg>
+          <span class="ping"></span>
+        </button>
+        <button class="icon-btn" aria-label="Help">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M9.5 9.3a2.5 2.5 0 114 2c-.7.6-1.5 1-1.5 2.2" />
+            <circle cx="12" cy="16.7" r="0.4" fill="currentColor" stroke="none" />
+          </svg>
+        </button>
+        <div class="topbar-profile">
+          <div class="avatar">P</div>
+          <div>
+            <div class="tp-name">Priya Sharma</div>
+            <div class="tp-sub">•••• 8842</div>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+
+      <!-- HERO ROW: Balance + Fraud Shield -->
+      <section class="hero-row">
+        <div class="hero-card balance-card">
+          <div class="bc-top">
+            <div class="label">Available balance</div>
+            <div class="bc-badge">Premium</div>
+          </div>
+
+          <div class="bc-amount-row">
+            <span class="bc-amount" id="balanceAmount" data-value="{{ balance|default:'3,42,180.50' }}"
+              data-hidden-text="₹ ••••••••••">₹ ••••••••••</span>
+            <button class="eye-btn" id="eyeToggle" aria-label="Show balance">
+              <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+                <circle cx="12" cy="12" r="3" />
+                <path d="M4 4l16 16" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="bc-mask">Account •••• 8842</div>
+
+          <div class="bc-bottom">
+            <div class="hero-actions">
+              <button class="primary-cta" onclick="location.href='{% url 'transfer' %}'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 8l4 4-4 4M3 12h18" />
+                </svg>
+                Send money
+              </button>
+              <button>Request statement</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-card shield-card">
+          <div class="sc-top">
+            <div class="label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z" />
+              </svg>
+              Fraud Shield
+            </div>
+            <div class="sc-status-pill"><span class="dot"></span>PROTECTED</div>
+          </div>
+
+          <p class="sc-desc">AI is monitoring your account in real time.</p>
+
+          <!-- <div class="waveform">
+            <svg viewBox="0 0 300 40" preserveAspectRatio="none">
+              <path
+                d="M0,20 L20,20 L28,8 L36,32 L44,20 L70,20 L78,13 L86,27 L94,20 L130,20 L138,6 L146,34 L154,20 L190,20 L198,15 L206,25 L214,20 L250,20 L258,10 L266,30 L274,20 L300,20"
+                fill="none" stroke="var(--brand)" stroke-width="1.6" />
+            </svg>
+          </div> -->
+
+          <div class="sc-stat-list">
+            <div class="sc-stat-row"><span class="k">Risk Level</span><span class="v v-safe">Low</span></div>
+            <div class="sc-stat-row"><span class="k">Device Trust</span><span class="v">Recognized</span></div>
+            <div class="sc-stat-row"><span class="k">Last Scan</span><span class="v">2 seconds ago</span></div>
+            <div class="sc-stat-row"><span class="k">OTP Window</span><span class="v">60s TTL</span></div>
+          </div>
+
+          <div class="sc-cta">
+            View Security Activity
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section class="panel">
+        <div class="section-head">
+          <h2>Recent transactions</h2>
+          <div class="filter-tabs" id="filterTabs">
+            <button class="filter-tab active" data-filter="all">All</button>
+            <button class="filter-tab" data-filter="safe">Safe</button>
+            <button class="filter-tab" data-filter="review">Reviewed</button>
+            <button class="filter-tab" data-filter="blocked">Blocked</button>
+          </div>
+        </div>
+
+        <div class="tx-list" id="txList">
+          <div class="tx-item" data-status="safe">
+            <div class="tx-left">
+              <div class="tx-icon safe">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 5h2l2.4 11.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 9H6" />
+                  <circle cx="9" cy="20" r="1" />
+                  <circle cx="17" cy="20" r="1" />
+                </svg>
+              </div>
+              <div>
+                <div class="tx-name">BigBasket</div>
+                <div class="tx-meta">Today · 10:42 AM</div>
+              </div>
+            </div>
+            <div class="tx-right">
+              <div class="tx-amt">−₹1,240</div>
+              <span class="badge safe"><span class="dot"></span>Safe</span>
+            </div>
+          </div>
+
+          <div class="tx-item blocked" data-status="blocked">
+            <div class="tx-left">
+              <div class="tx-icon blocked">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3l9.5 17H2.5L12 3z" />
+                  <path d="M12 10v4" />
+                  <circle cx="12" cy="17.3" r="0.6" fill="currentColor" stroke="none" />
+                </svg>
+              </div>
+              <div>
+                <div class="tx-name">Transfer — tx_8836</div>
+                <div class="tx-meta">Today · 9:15 AM</div>
+              </div>
+            </div>
+            <div class="tx-right">
+              <div class="tx-amt">−₹98,000</div>
+              <span class="badge blocked"><span class="dot"></span>Blocked</span>
+            </div>
+          </div>
+
+          <div class="tx-item" data-status="safe">
+            <div class="tx-left">
+              <div class="tx-icon safe">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M10 8.5l6 3.5-6 3.5v-7z" fill="currentColor" stroke="none" />
+                </svg>
+              </div>
+              <div>
+                <div class="tx-name">Netflix</div>
+                <div class="tx-meta">Yesterday · 6:30 PM</div>
+              </div>
+            </div>
+            <div class="tx-right">
+              <div class="tx-amt">−₹649</div>
+              <span class="badge safe"><span class="dot"></span>Safe</span>
+            </div>
+          </div>
+
+          <div class="tx-item" data-status="review">
+            <div class="tx-left">
+              <div class="tx-icon review">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="8.5" r="3.5" />
+                  <path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5" />
+                </svg>
+              </div>
+              <div>
+                <div class="tx-name">Transfer — Rohan Mehta</div>
+                <div class="tx-meta">Yesterday · 2:05 PM</div>
+              </div>
+            </div>
+            <div class="tx-right">
+              <div class="tx-amt">−₹12,500</div>
+              <span class="badge review"><span class="dot"></span>Reviewed</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-state" id="txEmpty" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="3" y="7" width="18" height="13" rx="2" />
+            <path d="M3 10h18M8 3.5v4M16 3.5v4" />
+          </svg>
+          <div class="t">No transactions here</div>
+          <div class="s">Nothing matches this filter yet.</div>
+        </div>
+      </section>
+
+      <!-- SEND MONEY -->
+      <section class="panel send-panel" id="sendMoneySection">
+        <div class="send-head">
+          <h2>Send Money</h2>
+          <p>Transfer safely to any account</p>
+        </div>
+
+        <div class="send-grid">
+          <div class="send-form">
+            <div class="recipient-chips">
+              <button type="button" class="r-chip" data-name="Rohan Mehta" data-acc="4521 8890 1123"><span
+                  class="r-av">RM</span>Rohan Mehta</button>
+              <button type="button" class="r-chip" data-name="Ananya Kulkarni" data-acc="7734 2210 9987"><span
+                  class="r-av">AK</span>Ananya K.</button>
+              <button type="button" class="r-chip" data-name="Vikram Singh" data-acc="3390 6612 4456"><span
+                  class="r-av">VS</span>Vikram S.</button>
+            </div>
+
+            <div class="recipient-preview">
+              <div class="avatar" id="rpAvatar">RM</div>
+              <div>
+                <div class="rp-name" id="rpName">Rohan Mehta</div>
+                <div class="rp-acc" id="rpAcc">4521 8890 1123</div>
+              </div>
+            </div>
+
+            <form id="transferForm">
+              {% csrf_token %}
+              <div class="field">
+                <label>Recipient Account</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2.5" />
+                    <path d="M2 10h20" />
+                  </svg>
+                  <input id="payee" placeholder="e.g. 4521 8890 1123" value="4521 8890 1123">
+                </div>
+              </div>
+              <div class="field">
+                <label>Recipient Name</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8.5" r="3.5" />
+                    <path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5" />
+                  </svg>
+                  <input id="recipient" placeholder="Full name" value="Rohan Mehta">
+                </div>
+              </div>
+              <div class="field">
+                <label>Amount</label>
+                <div class="amount-row">
+                  <span class="cur">₹</span>
+                  <input id="amount" type="number" value="45000">
+                </div>
+              </div>
+              <button type="submit" class="primary" id="reviewBtn">
+                <span class="btn-label">Continue →</span>
+                <span class="spinner"></span>
+              </button>
+            </form>
+            <p class="note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z" />
+              </svg>
+              Protected by Fraud Shield · OTP required
+            </p>
+          </div>
+
+          <div class="send-summary">
+            <div class="summary-title">Transfer summary</div>
+            <div class="summary-row"><span class="k">Recipient</span><span class="v" id="sumRecipient">Rohan
+                Mehta</span></div>
+            <div class="summary-row"><span class="k">Amount</span><span class="v" id="sumAmount">₹45,000</span></div>
+            <div class="summary-row"><span class="k">Fee</span><span class="v">Free</span></div>
+            <div class="summary-row"><span class="k">Arrival</span><span class="v">Instant</span></div>
+
+            <div class="summary-security">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z" />
+                <path d="M9 12l2 2 4-4.5" />
+              </svg>
+              <div>
+                <div class="t">Fraud Shield will screen this transfer</div>
+                <div class="s">Velocity, device, and location checked before funds move.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- OTP Modal -->
+<div class="overlay" id="otpOverlay">
+  <div class="modal">
+    <h2>Enter OTP</h2>
+    <p class="sub">Sent to your registered number ending •••82</p>
+    <div class="otp-boxes">
+      <input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input
+        maxlength="1">
+    </div>
+    <div class="timer" id="otpTimer">Expires in 0:58</div>
+    <div id="otpDemoHint" style="display:none;margin:8px 0 12px;font-size:12.5px;color:#831843;font-weight:600;"></div>
+    <button class="primary" id="submitOtp">
+      <span class="btn-label">Confirm transfer</span>
+      <span class="spinner"></span>
+    </button>
+  </div>
+</div>
+
+<!-- Fraud Verification Chat Modal (Agent B) -->
+<div class="overlay" id="fraudOverlay">
+  <div class="modal chat-modal">
+    <div class="chat-head" id="chatHead">
+      <div class="dot"></div>
+      <div>
+        <div class="t" id="chatHeadTitle">Verification needed</div>
+        <div class="s">We noticed something unusual about this transfer</div>
+      </div>
+    </div>
+    <div class="chat-body" id="chatBody">
+      <div class="msg bot">
+        <div class="bubble">This OTP was submitted in 41ms — faster than a person can type. We've paused the transfer to
+          confirm it's really you.</div>
+      </div>
+      <div class="msg bot">
+        <div class="bubble">Can you confirm you're initiating this transfer of ₹45,000 to Rohan Mehta right now?</div>
+      </div>
+    </div>
+    <div class="chat-actions">
+      <button class="no" id="denyBtn">No, this isn't me</button>
+      <button class="yes" id="confirmBtn">Yes, it's me</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="dot"></span><span id="toastMsg">Transfer approved</span></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'portal/js/transfer.js' %}"></script>
+{% endblock %}

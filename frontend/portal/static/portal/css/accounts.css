@@ -1,0 +1,113 @@
+/* ============================================================
+   Reuses sidebar/topbar/badge/button styles from transfer.css.
+   Only Accounts page-specific components live here.
+   ============================================================ */
+
+.ac-main{ padding:32px 42px 70px; width:100%; }
+
+/* --- Header --- */
+.ac-header{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:22px; gap:16px; flex-wrap:wrap; }
+.ac-header h1{ font-size:22px; font-weight:700; letter-spacing:-.3px; font-family:var(--font-display); }
+.ac-header p{ font-size:var(--fs-sm); color:var(--text-muted); margin-top:4px; }
+
+.ac-add-btn{
+  display:flex; align-items:center; gap:7px; padding:10px 16px; border-radius:11px;
+  border:none; background:var(--brand); color:#fff; font-size:12.5px; font-weight:650;
+  cursor:pointer; transition:background .15s ease; flex-shrink:0;
+}
+.ac-add-btn:hover{ background:var(--brand-dark); }
+.ac-add-btn svg{ width:14px; height:14px; }
+
+/* --- Grid --- */
+.ac-row{ display:grid; grid-template-columns:minmax(0, 1.5fr) minmax(320px, 1fr); gap:24px; margin-bottom:20px; align-items:start; }
+.ac-card{ background:var(--card); border:1px solid var(--line); border-radius:var(--r-lg); box-shadow:var(--shadow-card); padding:22px 24px; }
+.ac-card-title{ font-size:11px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--text-muted); margin-bottom:14px; }
+
+/* --- Primary account card --- */
+.ac-primary-card{
+  background:linear-gradient(155deg, var(--brand) 0%, var(--brand-dark) 100%);
+  color:#FCEFF5; position:relative; overflow:hidden;
+}
+.ac-primary-card::after{
+  content:""; position:absolute; right:-50px; top:-60px; width:220px; height:220px;
+  background:radial-gradient(circle, rgba(233,213,245,.25), transparent 70%);
+}
+.ac-p-top{ display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; }
+.ac-p-brand{ display:flex; align-items:center; gap:8px; }
+.ac-p-brand .logo-mark{ width:22px; height:22px; }
+.ac-p-brand span{ font-size:11.5px; font-weight:700; letter-spacing:.3px; opacity:.9; }
+.ac-p-type-badge{ font-size:10px; font-weight:700; padding:4px 10px; border-radius:20px; background:rgba(255,255,255,.14); letter-spacing:.3px; }
+
+.ac-p-label{ font-size:11px; letter-spacing:.2px; opacity:.75; margin-top:16px; position:relative; z-index:1; }
+.ac-p-balance-row{ display:flex; align-items:center; gap:12px; margin-top:5px; position:relative; z-index:1; }
+.ac-p-balance{ font-size:26px; font-weight:700; font-family:var(--font-mono); transition:opacity .2s ease; }
+.ac-eye-btn{
+  width:30px; height:30px; border-radius:50%; border:1px solid rgba(255,255,255,.3);
+  background:rgba(255,255,255,.1); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; transition:background .15s ease;
+}
+.ac-eye-btn:hover{ background:rgba(255,255,255,.2); }
+.ac-eye-btn svg{ width:14px; height:14px; color:#fff; }
+
+.ac-p-meta{ font-size:12px; opacity:.75; margin-top:10px; position:relative; z-index:1; }
+.ac-p-bottom{ display:flex; align-items:center; justify-content:space-between; margin-top:16px; position:relative; z-index:1; }
+.ac-p-status{ display:flex; align-items:center; gap:6px; font-size:11.5px; font-weight:650; }
+.ac-p-status .dot{ width:7px; height:7px; border-radius:50%; background:var(--safe); }
+
+.ac-p-actions{ display:flex; gap:9px; margin-top:18px; position:relative; z-index:1; }
+.ac-p-actions button{
+  padding:9px 14px; border-radius:10px; font-size:12px; font-weight:650; cursor:pointer;
+  border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.08); color:#fff;
+  transition:background .15s ease;
+}
+.ac-p-actions button:hover{ background:rgba(255,255,255,.17); }
+
+/* --- Account details rows --- */
+.ac-detail-row{ display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line-soft); font-size:12.5px; }
+.ac-detail-row:last-child{ border-bottom:none; }
+.ac-detail-row .k{ color:var(--text-muted); }
+.ac-detail-row .v{ font-weight:650; text-align:right; }
+.ac-detail-row .v.mono{ font-family:var(--font-mono); }
+.ac-detail-row .v.safe{ display:flex; align-items:center; gap:5px; color:var(--safe); }
+.ac-detail-row .v.safe .dot{ width:6px; height:6px; border-radius:50%; background:var(--safe); }
+
+/* --- Account security summary --- */
+.ac-sec-row{ display:flex; align-items:center; justify-content:space-between; padding:9px 0; }
+.ac-sec-left{ display:flex; align-items:center; gap:9px; font-size:12.5px; }
+.ac-sec-icon{ width:26px; height:26px; border-radius:9px; background:var(--safe-bg); color:var(--safe); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ac-sec-icon svg{ width:13px; height:13px; }
+.ac-sec-val{ font-size:11.5px; font-weight:650; color:var(--safe); }
+
+.ac-view-security{
+  display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:650; color:var(--brand);
+  margin-top:12px; cursor:pointer; transition:gap .15s ease;
+}
+.ac-view-security svg{ width:13px; height:13px; transition:transform .15s ease; }
+.ac-view-security:hover svg{ transform:translateX(3px); }
+
+/* --- Account information compact grid --- */
+.ac-info-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.ac-info-item .k{ font-size:10.5px; color:var(--text-muted); }
+.ac-info-item .v{ font-size:13px; font-weight:650; margin-top:2px; }
+
+/* --- Toast (reused visual pattern for "Coming soon" feedback) --- */
+.ac-toast{
+  position:fixed; bottom:24px; left:50%; transform:translate(-50%, 20px);
+  background:var(--text); color:#fff; padding:11px 18px; border-radius:11px; font-size:12.5px;
+  opacity:0; pointer-events:none; z-index:200; transition:opacity .2s ease, transform .2s ease;
+  box-shadow:var(--shadow-modal);
+}
+.ac-toast.show{ opacity:1; transform:translate(-50%, 0); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1080px){
+  .ac-row{ grid-template-columns:1fr; }
+}
+@media (max-width: 768px){
+  .ac-main{ padding:20px 16px 60px; }
+  .ac-header{ flex-direction:column; }
+  .ac-p-actions{ flex-direction:column; }
+  .ac-info-grid{ grid-template-columns:1fr 1fr; }
+}

@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engine unavailable — SOC</title>
+<link rel="stylesheet" href="{% static 'soc/css/soc.css' %}">
+</head>
+<body class="soc-body">
+<div class="soc-403">
+  <h1>502</h1>
+  <p style="font-size:16px;font-weight:600;">The fraud engine didn't answer</p>
+  <p style="color:var(--soc-text-muted);font-size:13px;">{{ message }}</p>
+  <a href="" class="soc-btn soc-btn-primary" style="margin-top:16px;">Try again</a>
+</div>
+</body>
+</html>

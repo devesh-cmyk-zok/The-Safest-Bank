@@ -1,0 +1,171 @@
+{% extends "soc/base_soc.html" %}
+{% block title %}Risk Analytics — SOC{% endblock %}
+{% block page_title %}Risk Analytics{% endblock %}
+{% block page_sub %}Deep-dive fraud analytics · CNN-BiLSTM pipeline data{% endblock %}
+
+{% block content %}
+
+<!-- Filter Bar -->
+<div class="soc-card mb-4" style="margin-bottom:16px;">
+  <div class="soc-filter-bar">
+    <select class="soc-select"><option>Last 24 Hours</option><option>Last 7 Days</option><option>Last 30 Days</option></select>
+    <select class="soc-select"><option>All Channels</option><option>Mobile API</option><option>Web Banking</option><option>ATM</option><option>UPI</option></select>
+    <select class="soc-select"><option>All Fraud Types</option><option>Velocity Spike</option><option>Geo Anomaly</option><option>New Device</option></select>
+    <select class="soc-select"><option>All Risk Levels</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select>
+    <button class="soc-btn soc-btn-primary soc-btn-sm">Apply Filters</button>
+    <span style="margin-left:auto;font-size:11px;color:var(--soc-text-muted);">Showing: 24h rolling window</span>
+  </div>
+</div>
+
+<!-- Charts Row 1 -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div><div class="soc-card-title">Fraud Rate Trend</div><div class="soc-card-sub">24-hour rolling window</div></div>
+      <span style="font-size:11px;color:var(--soc-critical);font-weight:600;">Peak: 6.2% at 22:00</span>
+    </div>
+    <div class="soc-card-body"><div class="soc-chart-wrap"><canvas id="a-fraudTrend"></canvas></div></div>
+  </div>
+
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div><div class="soc-card-title">Transaction Volume</div><div class="soc-card-sub">Hourly transaction count</div></div>
+    </div>
+    <div class="soc-card-body"><div class="soc-chart-wrap"><canvas id="a-txnVolume"></canvas></div></div>
+  </div>
+
+</div>
+
+<!-- Charts Row 2 -->
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div><div class="soc-card-title">Fraud Type Distribution</div><div class="soc-card-sub">By category</div></div>
+    </div>
+    <div class="soc-card-body"><div class="soc-chart-wrap"><canvas id="a-fraudTypes"></canvas></div></div>
+  </div>
+
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div><div class="soc-card-title">Channel Risk</div><div class="soc-card-sub">Fraud rate by channel</div></div>
+    </div>
+    <div class="soc-card-body"><div class="soc-chart-wrap"><canvas id="a-channelRisk"></canvas></div></div>
+  </div>
+
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div><div class="soc-card-title">Risk Distribution</div><div class="soc-card-sub">By risk tier per 3h window</div></div>
+    </div>
+    <div class="soc-card-body"><div class="soc-chart-wrap"><canvas id="a-riskDist"></canvas></div></div>
+  </div>
+
+</div>
+
+<!-- Charts Row 3 -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div><div class="soc-card-title">Hourly Fraud Patterns</div><div class="soc-card-sub">Fraud alerts by hour of day</div></div>
+    </div>
+    <div class="soc-card-body"><div class="soc-chart-wrap"><canvas id="a-hourly"></canvas></div></div>
+  </div>
+
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div><div class="soc-card-title">Geographic Anomalies</div><div class="soc-card-sub">Unusual location detections by region</div></div>
+    </div>
+    <div class="soc-card-body">
+      <div style="padding:10px 0;">
+        {% with regions="Maharashtra,Delhi,Karnataka,Tamil Nadu,Gujarat,West Bengal,Rajasthan,International" %}
+        {% with counts="38,24,19,14,11,9,7,15" %}
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          {% for region in regions|slice:":8" %}
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+              <span style="font-size:11.5px;">{{ region }}</span>
+              <span style="font-size:11px;color:var(--soc-amber);font-weight:600;">{{ forloop.counter }}</span>
+            </div>
+            <div style="height:4px;background:var(--soc-border);border-radius:2px;">
+              <div style="height:100%;background:linear-gradient(90deg,var(--soc-amber-dk),var(--soc-amber));border-radius:2px;width:{{ forloop.revcounter }}0%;"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endwith %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const TREND  = {{ fraud_trend|safe }};
+const RDIST  = {{ risk_dist|safe }};
+const FTYPES = {{ fraud_types|safe }};
+const CHRISK = {{ channel_risk|safe }};
+const HOURLY = {{ hourly|safe }};
+
+Chart.defaults.color = '#64748B';
+Chart.defaults.font.family = 'Inter, sans-serif';
+Chart.defaults.font.size = 11;
+const G = 'rgba(36,49,73,0.6)';
+
+function lineChart(id, labels, data, color) {
+  return new Chart(document.getElementById(id), {
+    type: 'line',
+    data: { labels, datasets: [{ data, borderColor: color, backgroundColor: color.replace('1)', '0.08)'), borderWidth: 2, pointRadius: 2, tension: 0.4, fill: true }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: { grid: { color: G } }, y: { grid: { color: G } } } }
+  });
+}
+
+lineChart('a-fraudTrend', TREND.labels, TREND.values, 'rgba(245,158,11,1)');
+
+// Volume chart
+lineChart('a-txnVolume', HOURLY.labels.filter((_,i) => i % 2 === 0), HOURLY.values.filter((_,i) => i % 2 === 0), 'rgba(59,130,246,1)');
+
+// Fraud types doughnut
+new Chart(document.getElementById('a-fraudTypes'), {
+  type: 'doughnut',
+  data: { labels: FTYPES.labels, datasets: [{ data: FTYPES.values, backgroundColor: ['#EF4444','#F97316','#F59E0B','#3B82F6','#8B5CF6','#22C55E'], borderWidth: 0, hoverOffset: 4 }] },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, padding: 8 } } }, cutout: '65%' }
+});
+
+// Channel risk bar
+new Chart(document.getElementById('a-channelRisk'), {
+  type: 'bar',
+  data: { labels: CHRISK.labels, datasets: [{ label: 'Fraud Rate %', data: CHRISK.fraud_rate, backgroundColor: 'rgba(239,68,68,0.7)', borderRadius: 4 }] },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+    scales: { x: { grid: { display: false } }, y: { grid: { color: G }, ticks: { callback: v => v + '%' } } } }
+});
+
+// Risk distribution stacked
+new Chart(document.getElementById('a-riskDist'), {
+  type: 'bar',
+  data: { labels: RDIST.labels, datasets: [
+    { label: 'Low',      data: RDIST.low,      backgroundColor: 'rgba(34,197,94,0.7)',  borderRadius: 2 },
+    { label: 'Medium',   data: RDIST.medium,   backgroundColor: 'rgba(245,158,11,0.7)', borderRadius: 2 },
+    { label: 'High',     data: RDIST.high,     backgroundColor: 'rgba(249,115,22,0.7)', borderRadius: 2 },
+    { label: 'Critical', data: RDIST.critical, backgroundColor: 'rgba(239,68,68,0.7)',  borderRadius: 2 },
+  ]},
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+    scales: { x: { grid: { display: false }, stacked: true }, y: { grid: { color: G }, stacked: true } } }
+});
+
+// Hourly fraud
+new Chart(document.getElementById('a-hourly'), {
+  type: 'bar',
+  data: { labels: HOURLY.labels, datasets: [{ data: HOURLY.values, backgroundColor: HOURLY.values.map(v => v > 30 ? 'rgba(239,68,68,.7)' : v > 15 ? 'rgba(249,115,22,.7)' : 'rgba(245,158,11,.7)'), borderRadius: 3 }] },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+    scales: { x: { grid: { display: false } }, y: { grid: { color: G } } } }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,290 @@
+{% extends "soc/base_soc.html" %}
+{% load static %}
+
+{% block title %}Fraud Dashboard — SOC | TheSafestBank{% endblock %}
+
+{% block page_title %}Fraud Monitoring{% endblock %}
+{% block page_sub %}Real-time CNN-BiLSTM detection · Last 24 hours{% endblock %}
+
+{% block content %}
+
+<!-- ── KPI Cards ──────────────────────────────────────────── -->
+<div class="soc-kpi-grid" id="kpiGrid">
+
+  <div class="soc-kpi-card accent-red">
+    <div class="soc-kpi-label">Financial Exposure</div>
+    <div class="soc-kpi-value" id="kpi-exposure">{{ kpis.financial_exposure }}</div>
+    <div class="soc-kpi-meta">{{ kpis.exposure_held }} transactions held</div>
+  </div>
+
+  <div class="soc-kpi-card accent-green">
+    <div class="soc-kpi-label">Fraud Detection Rate</div>
+    <div class="soc-kpi-value" id="kpi-detection">{{ kpis.detection_rate }}%</div>
+    <div class="soc-kpi-meta">↑ 0.8% vs baseline</div>
+  </div>
+
+  <div class="soc-kpi-card accent-amber">
+    <div class="soc-kpi-label">Under Review</div>
+    <div class="soc-kpi-value" id="kpi-review">{{ kpis.under_review }}</div>
+    <div class="soc-kpi-meta">{{ kpis.under_review_high }} high · {{ kpis.under_review|add:"-"|add:kpis.under_review_high|floatformat:0 }} medium</div>
+  </div>
+
+  <div class="soc-kpi-card">
+    <div class="soc-kpi-label">Mean Time to Resolve</div>
+    <div class="soc-kpi-value" style="font-size:18px;" id="kpi-mtr">{{ kpis.mtr }}</div>
+    <div class="soc-kpi-meta" style="color: var(--soc-green);">SLA target: 8m 00s ✓</div>
+  </div>
+
+  <div class="soc-kpi-card accent-blue">
+    <div class="soc-kpi-label">False Positive Rate</div>
+    <div class="soc-kpi-value" id="kpi-fpr">{{ kpis.false_positive_rate }}%</div>
+    <div class="soc-kpi-meta">Threshold: 5.0%</div>
+  </div>
+
+  <div class="soc-kpi-card accent-amber">
+    <div class="soc-kpi-label">Model Confidence</div>
+    <div class="soc-kpi-value" id="kpi-conf">{{ kpis.model_confidence }}%</div>
+    <div class="soc-kpi-meta">{{ kpis.predictions_today|default:"12,847" }} predictions today</div>
+  </div>
+
+</div>
+
+<!-- ── Charts Row ─────────────────────────────────────────── -->
+<div class="soc-charts-grid">
+
+  <!-- Fraud Rate Trend -->
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div>
+        <div class="soc-card-title">Fraud Rate Trend</div>
+        <div class="soc-card-sub">24-hour rolling · flagged / total transactions</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--soc-text-muted);">
+          <span style="width:12px;height:2px;background:var(--soc-amber);display:inline-block;border-radius:1px;"></span>
+          Fraud Rate %
+        </div>
+        <span style="font-size:11px;color:var(--soc-critical);font-weight:600;">Peak: 6.2% at 22:00</span>
+      </div>
+    </div>
+    <div class="soc-card-body" style="padding-bottom:10px;">
+      <div class="soc-chart-wrap">
+        <canvas id="fraudTrendChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risk Distribution -->
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div>
+        <div class="soc-card-title">Risk Distribution</div>
+        <div class="soc-card-sub">Transactions by risk tier per 3-hour window</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <span style="font-size:9.5px;color:var(--soc-low);">● Low</span>
+        <span style="font-size:9.5px;color:var(--soc-medium);">● Med</span>
+        <span style="font-size:9.5px;color:var(--soc-high);">● High</span>
+        <span style="font-size:9.5px;color:var(--soc-critical);">● Crit</span>
+      </div>
+    </div>
+    <div class="soc-card-body" style="padding-bottom:10px;">
+      <div class="soc-chart-wrap">
+        <canvas id="riskDistChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Live Alert Feed ────────────────────────────────────── -->
+<div class="soc-card">
+  <div class="soc-card-header">
+    <div>
+      <div class="soc-card-title" style="display:flex;align-items:center;gap:8px;">
+        Live Alert Feed
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--soc-critical);">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--soc-critical);animation:livePulse 2s infinite;display:block;"></span>
+          <span id="activeAlertCount">{{ alerts|length }}</span> active
+        </span>
+      </div>
+      <div class="soc-card-sub">Click any row to investigate · auto-refreshes every 10s</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div class="soc-search-wrap" style="min-width:200px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="soc-input" id="alertSearch" placeholder="Search TXN ID, account…" oninput="filterAlerts(this.value)">
+      </div>
+      <select class="soc-select" id="alertStatusFilter" onchange="filterAlerts()">
+        <option value="">All Status</option>
+        <option value="PENDING">Pending</option>
+        <option value="REVIEWING">Reviewing</option>
+        <option value="HELD">Held</option>
+        <option value="ESCALATED">Escalated</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="soc-table-wrap" style="overflow-x:auto;">
+    <table class="soc-table" id="alertTable">
+      <thead>
+        <tr>
+          <th>Transaction ID</th>
+          <th>Account</th>
+          <th>Amount</th>
+          <th>Channel</th>
+          <th>Merchant</th>
+          <th>Risk Score</th>
+          <th>Top Factors</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="alertTableBody">
+        {% for alert in alerts %}
+        <tr onclick="openPanel('{{ alert.transaction_id }}')" data-status="{{ alert.status }}" data-txn="{{ alert.transaction_id|lower }}" data-acct="{{ alert.account_masked|lower }}">
+          <td class="text-mono" style="font-size:12px;color:var(--soc-amber);">{{ alert.transaction_id }}</td>
+          <td class="text-mono" style="font-size:12px;">{{ alert.account_masked }}</td>
+          <td style="font-weight:600;">{{ alert.amount }}</td>
+          <td style="color:var(--soc-text-muted);">{{ alert.channel }}</td>
+          <td>{{ alert.merchant }}</td>
+          <td>
+            <span class="soc-risk-score {{ alert.risk_level|lower }}">
+              {{ alert.risk_score }}
+              <span class="soc-badge {{ alert.risk_level|lower }}" style="margin-left:4px;">{{ alert.risk_level }}</span>
+            </span>
+          </td>
+          <td>
+            {% for factor in alert.top_factors %}
+              <span class="soc-factor-chip">{{ factor }}</span>
+            {% endfor %}
+          </td>
+          <td><span class="soc-badge {{ alert.status|lower }}">{{ alert.status }}</span></td>
+          <td onclick="event.stopPropagation()">
+            <button class="soc-btn soc-btn-ghost soc-btn-sm" onclick="openPanel('{{ alert.transaction_id }}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Investigate
+            </button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9" class="soc-empty">No active alerts</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// ── Chart Config ─────────────────────────────────────────────
+const FRAUD_TREND = {{ fraud_trend|safe }};
+const RISK_DIST   = {{ risk_dist|safe }};
+
+Chart.defaults.color = '#64748B';
+Chart.defaults.font.family = 'Inter, sans-serif';
+Chart.defaults.font.size = 11;
+
+const gridColor = 'rgba(36, 49, 73, 0.6)';
+
+// Fraud Trend Line Chart
+new Chart(document.getElementById('fraudTrendChart'), {
+  type: 'line',
+  data: {
+    labels: FRAUD_TREND.labels,
+    datasets: [{
+      label: 'Fraud Rate %',
+      data: FRAUD_TREND.values,
+      borderColor: '#F59E0B',
+      backgroundColor: 'rgba(245,158,11,0.08)',
+      borderWidth: 2,
+      pointRadius: 3,
+      pointBackgroundColor: '#F59E0B',
+      pointBorderColor: '#111A2B',
+      pointBorderWidth: 2,
+      tension: 0.4,
+      fill: true,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      backgroundColor: '#111A2B',
+      borderColor: '#243149',
+      borderWidth: 1,
+      titleColor: '#F1F5F9',
+      bodyColor: '#94A3B8',
+      callbacks: { label: ctx => ` ${ctx.parsed.y}%` }
+    }},
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { maxRotation: 0 } },
+      y: { grid: { color: gridColor }, min: 0, max: 8,
+        ticks: { callback: v => v + '%' }
+      }
+    }
+  }
+});
+
+// Risk Distribution Bar Chart
+new Chart(document.getElementById('riskDistChart'), {
+  type: 'bar',
+  data: {
+    labels: RISK_DIST.labels,
+    datasets: [
+      { label: 'Low',      data: RISK_DIST.low,      backgroundColor: 'rgba(34,197,94,0.7)',  borderRadius: 3 },
+      { label: 'Medium',   data: RISK_DIST.medium,   backgroundColor: 'rgba(245,158,11,0.7)', borderRadius: 3 },
+      { label: 'High',     data: RISK_DIST.high,     backgroundColor: 'rgba(249,115,22,0.7)', borderRadius: 3 },
+      { label: 'Critical', data: RISK_DIST.critical, backgroundColor: 'rgba(239,68,68,0.7)',  borderRadius: 3 },
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { backgroundColor: '#111A2B', borderColor: '#243149', borderWidth: 1,
+        titleColor: '#F1F5F9', bodyColor: '#94A3B8' }
+    },
+    scales: {
+      x: { grid: { display: false }, stacked: true },
+      y: { grid: { color: gridColor }, stacked: true }
+    }
+  }
+});
+
+// ── Alert Filtering ──────────────────────────────────────────
+function filterAlerts(searchTerm) {
+  const search = (searchTerm || document.getElementById('alertSearch').value || '').toLowerCase();
+  const statusVal = document.getElementById('alertStatusFilter').value;
+  const rows = document.querySelectorAll('#alertTableBody tr[data-txn]');
+  rows.forEach(row => {
+    const txn  = row.dataset.txn  || '';
+    const acct = row.dataset.acct || '';
+    const stat = row.dataset.status || '';
+    const matchSearch = !search || txn.includes(search) || acct.includes(search);
+    const matchStatus = !statusVal || stat === statusVal;
+    row.style.display = (matchSearch && matchStatus) ? '' : 'none';
+  });
+}
+
+// ── Live Polling (every 10 seconds) ─────────────────────────
+function pollAlerts() {
+  fetch('/soc/api/dashboard-stats/')
+    .then(r => r.json())
+    .then(data => {
+      // Update alert count
+      const countEl = document.getElementById('activeAlertCount');
+      if (countEl && data.alerts) countEl.textContent = data.alerts.length;
+      const sideEl = document.getElementById('sidebarAlertCount');
+      if (sideEl && data.alerts) sideEl.textContent = data.alerts.length;
+      refreshTimestamp();
+    })
+    .catch(() => {});
+}
+setInterval(pollAlerts, 10000);
+</script>
+{% endblock %}

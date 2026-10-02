@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Access Denied — SOC</title>
+<link rel="stylesheet" href="{% static 'soc/css/soc.css' %}">
+</head>
+<body class="soc-body">
+<div class="soc-403">
+  <h1>403</h1>
+  <p style="font-size:16px;font-weight:600;">Access Denied</p>
+  <p style="color:var(--soc-text-muted);font-size:13px;">You must be a staff member to access the Security Operations Center.</p>
+  <a href="/admin/login/" class="soc-btn soc-btn-primary" style="margin-top:16px;">Sign In as Staff</a>
+</div>
+</body>
+</html>

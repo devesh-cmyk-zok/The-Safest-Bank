@@ -1,0 +1,62 @@
+{
+  "trained_at": "2026-09-23T15:48:12+00:00",
+  "dataset": {
+    "kind": "synthetic",
+    "seed": 7,
+    "train": 23999,
+    "test": 6001,
+    "fraud_rate": 0.1,
+    "label_noise": 0.015,
+    "patterns": [
+      "account_takeover",
+      "scripted_bot",
+      "coached_victim",
+      "mule_burst"
+    ]
+  },
+  "model": {
+    "type": "MLP 6-16-8-1 (PyTorch)",
+    "features": [
+      "amount_ratio",
+      "velocity_1h",
+      "new_payee",
+      "new_device",
+      "cadence",
+      "distance"
+    ]
+  },
+  "threshold": 0.6,
+  "roc_auc": {
+    "rules_only": 0.9315,
+    "neural_net": 0.9423,
+    "ensemble": 0.9451
+  },
+  "ensemble": {
+    "roc_auc": 0.9451,
+    "accuracy": 0.9653,
+    "precision": 0.9543,
+    "recall": 0.7314,
+    "f1": 0.8281,
+    "false_positive_rate": 0.0045,
+    "confusion": {
+      "tp": 501,
+      "fp": 24,
+      "fn": 184,
+      "tn": 5292
+    }
+  },
+  "recall_by_pattern": {
+    "account_takeover": 0.816,
+    "scripted_bot": 0.987,
+    "coached_victim": 0.537,
+    "mule_burst": 0.927
+  },
+  "feature_importance": {
+    "velocity_1h": 0.1495,
+    "amount_ratio": 0.1393,
+    "new_payee": 0.0075,
+    "new_device": 0.0,
+    "distance": -0.0017,
+    "cadence": -0.0021
+  }
+}

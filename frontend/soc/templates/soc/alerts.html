@@ -1,0 +1,148 @@
+{% extends "soc/base_soc.html" %}
+{% block title %}Live Alerts — SOC{% endblock %}
+{% block page_title %}Live Alerts{% endblock %}
+{% block page_sub %}Real-time fraud alert feed · auto-refreshes every 8 seconds{% endblock %}
+
+{% block content %}
+
+<!-- Stats Row -->
+<div class="soc-stats-row">
+  <div class="soc-stat-card">
+    <div class="soc-stat-icon red">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <div class="soc-stat-info">
+      <div class="num" id="stats-critical">{{ alerts|length }}</div>
+      <div class="lbl">Active Alerts</div>
+    </div>
+  </div>
+  <div class="soc-stat-card">
+    <div class="soc-stat-icon amber">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </div>
+    <div class="soc-stat-info">
+      <div class="num">98.4%</div>
+      <div class="lbl">Model Confidence</div>
+    </div>
+  </div>
+  <div class="soc-stat-card">
+    <div class="soc-stat-icon green">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="soc-stat-info">
+      <div class="num">847<span style="font-size:13px;color:var(--soc-text-muted);">/min</span></div>
+      <div class="lbl">Throughput</div>
+    </div>
+  </div>
+  <div class="soc-stat-card">
+    <div class="soc-stat-icon blue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+    <div class="soc-stat-info">
+      <div class="num">12ms</div>
+      <div class="lbl">Avg Latency</div>
+    </div>
+  </div>
+</div>
+
+<!-- Live Alert Feed -->
+<div class="soc-card">
+  <div class="soc-card-header">
+    <div>
+      <div class="soc-card-title" style="display:flex;align-items:center;gap:8px;">
+        Live Alert Feed
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--soc-critical);font-weight:600;">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--soc-critical);animation:livePulse 2s infinite;display:block;"></span>
+          <span id="liveCount">{{ alerts|length }}</span> active
+        </span>
+      </div>
+      <div class="soc-card-sub">Click a row to open investigation panel</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <div class="soc-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="soc-input" placeholder="Search…" id="liveSearch" oninput="liveFilter()">
+      </div>
+      <select class="soc-select" id="liveRiskFilter" onchange="liveFilter()">
+        <option value="">All Risk</option>
+        <option value="CRITICAL">Critical</option>
+        <option value="HIGH">High</option>
+        <option value="MEDIUM">Medium</option>
+        <option value="LOW">Low</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="soc-table-wrap" style="overflow-x:auto;" id="alertFeed">
+    <table class="soc-table" id="liveTable">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Transaction ID</th>
+          <th>Account</th>
+          <th>Amount</th>
+          <th>Channel</th>
+          <th>Merchant</th>
+          <th>Risk Score</th>
+          <th>Top Factors</th>
+          <th>Status</th>
+          <th>Investigate</th>
+        </tr>
+      </thead>
+      <tbody id="liveTableBody">
+        {% for alert in alerts %}
+        <tr onclick="openPanel('{{ alert.transaction_id }}')" data-risk="{{ alert.risk_level }}" data-search="{{ alert.transaction_id|lower }} {{ alert.account_masked|lower }}">
+          <td class="soc-log-time">{{ alert.timestamp }}</td>
+          <td class="text-mono" style="color:var(--soc-amber);font-size:12px;">{{ alert.transaction_id }}</td>
+          <td class="text-mono" style="font-size:12px;">{{ alert.account_masked }}</td>
+          <td style="font-weight:600;">{{ alert.amount }}</td>
+          <td style="color:var(--soc-text-muted);">{{ alert.channel }}</td>
+          <td>{{ alert.merchant }}</td>
+          <td>
+            <span class="soc-risk-score {{ alert.risk_level|lower }}">
+              {{ alert.risk_score }}
+              <span class="soc-badge {{ alert.risk_level|lower }}" style="margin-left:4px;">{{ alert.risk_level }}</span>
+            </span>
+          </td>
+          <td>{% for f in alert.top_factors %}<span class="soc-factor-chip">{{ f }}</span>{% endfor %}</td>
+          <td><span class="soc-badge {{ alert.status|lower }}">{{ alert.status }}</span></td>
+          <td onclick="event.stopPropagation()">
+            <button class="soc-btn soc-btn-ghost soc-btn-sm" onclick="openPanel('{{ alert.transaction_id }}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="10" class="soc-empty">No active alerts</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function liveFilter() {
+  const s = document.getElementById('liveSearch').value.toLowerCase();
+  const r = document.getElementById('liveRiskFilter').value;
+  document.querySelectorAll('#liveTableBody tr[data-risk]').forEach(row => {
+    const ms = !s || (row.dataset.search || '').includes(s);
+    const mr = !r || row.dataset.risk === r;
+    row.style.display = (ms && mr) ? '' : 'none';
+  });
+}
+
+// Poll every 8 seconds
+setInterval(() => {
+  fetch('/soc/api/alerts/')
+    .then(r => r.json())
+    .then(d => {
+      const c = document.getElementById('liveCount');
+      if (c) c.textContent = d.alerts.length;
+      refreshTimestamp();
+    }).catch(() => {});
+}, 8000);
+</script>
+{% endblock %}

@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}THE SAFEST BANK — Accounts{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'portal/css/transfer.css' %}">
+<link rel="stylesheet" href="{% static 'portal/css/accounts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="trust-pulse" id="trustPulse"></div>
+
+<div class="mobile-topbar" id="mobileTopbar">
+  <div class="mobile-brand">
+    <img src="{% static 'portal/images/logo.jpeg' %}" alt="The Safest Bank" class="brand-logo-img" style="width:34px;height:34px;">
+    <span>THE SAFEST BANK</span>
+  </div>
+  <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+</div>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<div class="shell">
+  <!-- Sidebar (identical markup/classes to other pages — Accounts marked active) -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="brand">
+        <img src="{% static 'portal/images/logo.jpeg' %}" alt="The Safest Bank" class="brand-logo-img">
+        <div class="name">THE SAFEST BANK<small>AI-powered protection</small></div>
+      </div>
+      <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="nav-scroll">
+      <div class="nav-label">Main</div>
+      <nav class="nav">
+        <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+          data-tip="Overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="9" rx="1.5" />
+            <rect x="14" y="3" width="7" height="5" rx="1.5" />
+            <rect x="14" y="12" width="7" height="9" rx="1.5" />
+            <rect x="3" y="16" width="7" height="5" rx="1.5" />
+          </svg>
+          <span>Overview</span>
+        </a>
+        <a href="{% url 'transfer' %}" class="{% if request.resolver_match.url_name == 'transfer' %}active{% endif %}"
+          data-tip="Transfers">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 8l4 4-4 4M3 12h18" />
+          </svg>
+          <span>Transfers</span>
+        </a>
+        <a href="{% url 'transactions' %}"
+          class="{% if request.resolver_match.url_name == 'transactions' %}active{% endif %}" data-tip="Transactions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 3h8l3 3v15H7z" />
+            <path d="M10 8h4M10 12h4M10 16h2" />
+          </svg>
+          <span>Transactions</span>
+        </a>
+        <a href="{% url 'accounts' %}" class="{% if request.resolver_match.url_name == 'accounts' %}active{% endif %}"
+          data-tip="Accounts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="17" rx="2" />
+            <path d="M3 9h18M8 4v5M16 4v5" />
+          </svg>
+          <span>Accounts</span>
+        </a>
+        <a href="{% url 'fraud_shield' %}"
+          class="{% if request.resolver_match.url_name == 'fraud_shield' %}active{% endif %}" data-tip="Fraud Shield">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z" />
+          </svg>
+          <span>Fraud Shield</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="profile-block">
+      <div class="avatar">PS</div>
+      <div>
+        <div class="pname">Priya Sharma</div>
+        <div class="prole">Personal Account</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="content-area">
+    <main class="ac-main">
+
+      <div class="ac-header">
+        <div>
+          <h1>Accounts</h1>
+          <p>Manage your account and view your banking details.</p>
+        </div>
+        <button class="ac-add-btn" id="addAccountBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Add account
+        </button>
+      </div>
+
+      <!-- ROW 1: Primary account | Account details -->
+      <div class="ac-row">
+        <div class="ac-card ac-primary-card">
+          <div class="ac-p-top">
+            <div class="ac-p-brand">
+              <svg class="logo-mark" viewBox="0 0 32 32">
+                <path class="shield" d="M16 2l11 4v9c0 7.5-4.9 12.7-11 15-6.1-2.3-11-7.5-11-15V6l11-4z" fill="#fff" />
+                <text x="16" y="22" font-family="var(--font-display)" font-weight="800" font-size="15"
+                  fill="var(--brand-dark)" text-anchor="middle">S</text>
+              </svg>
+              <span>THE SAFEST BANK</span>
+            </div>
+            <span class="ac-p-type-badge">Primary Savings Account</span>
+          </div>
+
+          <div class="ac-p-label">Available balance</div>
+          <div class="ac-p-balance-row">
+            <span class="ac-p-balance" id="acBalance" data-value="3,42,180.50" data-hidden="₹ ••••••••••">₹
+              ••••••••••</span>
+            <button class="ac-eye-btn" id="acEyeToggle" aria-label="Show balance">
+              <svg id="acEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+                <circle cx="12" cy="12" r="3" />
+                <path d="M4 4l16 16" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="ac-p-meta">Account •••• 8842 · Savings Account</div>
+
+          <div class="ac-p-bottom">
+            <div class="ac-p-status"><span class="dot"></span>Active</div>
+          </div>
+
+          <div class="ac-p-actions">
+            <button id="viewDetailsBtn">View details</button>
+            <button id="requestStatementBtn">Request statement</button>
+          </div>
+        </div>
+
+        <div class="ac-card">
+          <div class="ac-card-title">Account details</div>
+          <div class="ac-detail-row"><span class="k">Account holder</span><span class="v">Priya Sharma</span></div>
+          <div class="ac-detail-row"><span class="k">Account type</span><span class="v">Savings Account</span></div>
+          <div class="ac-detail-row"><span class="k">Account number</span><span class="v mono">•••• 8842</span></div>
+          <div class="ac-detail-row"><span class="k">IFSC</span><span class="v mono">TSFB0001234</span></div>
+          <div class="ac-detail-row"><span class="k">Account status</span><span class="v safe"><span
+                class="dot"></span>Active</span></div>
+          <div class="ac-detail-row"><span class="k">Account opened</span><span class="v">12 June 2024</span></div>
+        </div>
+      </div>
+
+      <!-- ROW 2: Account security | Account information -->
+      <div class="ac-row">
+        <div class="ac-card">
+          <div class="ac-card-title">Account security</div>
+
+          <div class="ac-sec-row">
+            <div class="ac-sec-left">
+              <span class="ac-sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z" />
+                </svg></span>
+              Fraud Shield
+            </div>
+            <span class="ac-sec-val">Active</span>
+          </div>
+          <div class="ac-sec-row">
+            <div class="ac-sec-left">
+              <span class="ac-sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="5" y="2" width="14" height="20" rx="2" />
+                  <path d="M9 18h6" />
+                </svg></span>
+              Device
+            </div>
+            <span class="ac-sec-val">Recognized</span>
+          </div>
+          <div class="ac-sec-row">
+            <div class="ac-sec-left">
+              <span class="ac-sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="10" rx="2" />
+                  <path d="M7 11V8a5 5 0 0110 0v3" />
+                </svg></span>
+              Login security
+            </div>
+            <span class="ac-sec-val">Protected</span>
+          </div>
+
+          <a href="{% url 'fraud_shield' %}" class="ac-view-security" id="viewSecurityLink">
+            View security
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
+        </div>
+
+        <div class="ac-card">
+          <div class="ac-card-title">Account information</div>
+          <div class="ac-info-grid">
+            <div class="ac-info-item">
+              <div class="k">Branch</div>
+              <div class="v">Digital Banking</div>
+            </div>
+            <div class="ac-info-item">
+              <div class="k">Account type</div>
+              <div class="v">Savings</div>
+            </div>
+            <div class="ac-info-item">
+              <div class="k">Currency</div>
+              <div class="v">INR</div>
+            </div>
+            <div class="ac-info-item">
+              <div class="k">Status</div>
+              <div class="v">Active</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div class="ac-toast" id="acToast">Coming soon</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'portal/js/accounts.js' %}"></script>
+{% endblock %}

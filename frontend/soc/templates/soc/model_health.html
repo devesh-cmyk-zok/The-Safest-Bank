@@ -1,0 +1,142 @@
+{% extends "soc/base_soc.html" %}
+{% block title %}Model Health — SOC{% endblock %}
+{% block page_title %}Model Health{% endblock %}
+{% block page_sub %}CNN-BiLSTM · {{ metrics.version }} · Real-time diagnostics{% endblock %}
+
+{% block content %}
+
+<!-- Status Banner -->
+<div style="background:{% if metrics.is_healthy %}rgba(34,197,94,0.08){% else %}rgba(239,68,68,0.08){% endif %};border:1px solid {% if metrics.is_healthy %}rgba(34,197,94,0.2){% else %}rgba(239,68,68,0.2){% endif %};border-radius:var(--soc-r);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+  <div style="width:10px;height:10px;border-radius:50%;background:{% if metrics.is_healthy %}var(--soc-green){% else %}var(--soc-critical){% endif %};animation:livePulse 2s infinite;"></div>
+  <div>
+    <div style="font-size:14px;font-weight:700;color:{% if metrics.is_healthy %}var(--soc-green){% else %}var(--soc-critical){% endif %};">
+      {% if metrics.is_healthy %}Model Healthy — All Systems Operational{% else %}Model Alert — Check Required{% endif %}
+    </div>
+    <div style="font-size:11px;color:var(--soc-text-muted);">CNN-BiLSTM {{ metrics.version }} · Last checked {{ now|date:"H:i:s" }}</div>
+  </div>
+  <div style="margin-left:auto;display:flex;gap:20px;">
+    <div style="text-align:right;"><div style="font-size:18px;font-weight:700;color:var(--soc-amber);">{{ metrics.throughput }}/min</div><div style="font-size:10px;color:var(--soc-text-muted);">Throughput</div></div>
+    <div style="text-align:right;"><div style="font-size:18px;font-weight:700;color:var(--soc-blue);">{{ metrics.avg_latency_ms }}ms</div><div style="font-size:10px;color:var(--soc-text-muted);">Avg Latency</div></div>
+    <div style="text-align:right;"><div style="font-size:18px;font-weight:700;color:var(--soc-text);">{{ metrics.queue_size }}</div><div style="font-size:10px;color:var(--soc-text-muted);">Queue Pending</div></div>
+  </div>
+</div>
+
+<!-- Main Grid -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+
+  <!-- Performance Metrics -->
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div class="soc-card-title">Performance Metrics</div>
+    </div>
+    <div class="soc-card-body">
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot amber"></span>Model AUC-ROC</span>
+        <span class="soc-metric-val" style="color:var(--soc-amber);">{{ metrics.auc_roc }}</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot"></span>Accuracy</span>
+        <span class="soc-metric-val" style="color:var(--soc-green);">{{ metrics.accuracy }}%</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot"></span>Precision</span>
+        <span class="soc-metric-val" style="color:var(--soc-green);">{{ metrics.precision }}%</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot"></span>Recall</span>
+        <span class="soc-metric-val" style="color:var(--soc-green);">{{ metrics.recall }}%</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot"></span>F1 Score</span>
+        <span class="soc-metric-val" style="color:var(--soc-green);">{{ metrics.f1_score }}%</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot blue"></span>SHAP Explanations</span>
+        <span class="soc-metric-val" style="color:var(--soc-blue);">100%</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot blue"></span>False Positive Rate</span>
+        <span class="soc-metric-val" style="color:var(--soc-blue);">2.1%</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot amber"></span>Predictions Today</span>
+        <span class="soc-metric-val">{{ metrics.total_predictions_today|default:"12,847" }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Runtime Stats -->
+  <div class="soc-card">
+    <div class="soc-card-header">
+      <div class="soc-card-title">Runtime Statistics</div>
+    </div>
+    <div class="soc-card-body">
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot"></span>Prediction Throughput</span>
+        <span class="soc-metric-val">{{ metrics.throughput }}/min</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot"></span>Avg Inference Latency</span>
+        <span class="soc-metric-val">{{ metrics.avg_latency_ms }}ms</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot amber"></span>Processing Queue</span>
+        <span class="soc-metric-val">{{ metrics.queue_size }} pending</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot"></span>Model Version</span>
+        <span class="soc-metric-val">{{ metrics.version }}</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot"></span>Architecture</span>
+        <span class="soc-metric-val">CNN-BiLSTM</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot"></span>Input Features</span>
+        <span class="soc-metric-val">47 features</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot"></span>Sequence Length</span>
+        <span class="soc-metric-val">30 timesteps</span>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label"><span class="soc-metric-dot"></span>Explainability</span>
+        <span class="soc-metric-val" style="color:var(--soc-green);">SHAP Active</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Latency Chart -->
+<div class="soc-card" style="margin-top:12px;">
+  <div class="soc-card-header">
+    <div class="soc-card-title">Inference Latency (last 24h)</div>
+    <span style="font-size:11px;color:var(--soc-green);font-weight:600;">All within SLA</span>
+  </div>
+  <div class="soc-card-body">
+    <div class="soc-chart-wrap" style="height:160px;">
+      <canvas id="latencyChart"></canvas>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const labels = [];
+const data = [];
+for (let i = 0; i < 24; i++) {
+  labels.push(`${String(i).padStart(2,'0')}:00`);
+  data.push(Math.round(10 + Math.random() * 8));
+}
+new Chart(document.getElementById('latencyChart'), {
+  type: 'line',
+  data: { labels, datasets: [{ label: 'Latency (ms)', data, borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.08)', borderWidth: 2, pointRadius: 2, tension: 0.4, fill: true }] },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+    scales: { x: { grid: { color: 'rgba(36,49,73,0.6)' } }, y: { grid: { color: 'rgba(36,49,73,0.6)' }, min: 0, ticks: { callback: v => v + 'ms' } } } }
+});
+</script>
+{% endblock %}

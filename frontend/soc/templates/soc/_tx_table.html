@@ -1,0 +1,31 @@
+{# Flagged/transaction table. Args: rows (services.tx_view dicts), empty (message). #}
+<div class="soc-table-wrap" style="overflow-x:auto;">
+  <table class="soc-table">
+    <thead>
+      <tr>
+        <th scope="col">When</th>
+        <th scope="col">Transaction</th>
+        <th scope="col">From → To</th>
+        <th scope="col">Amount</th>
+        <th scope="col">Risk</th>
+        <th scope="col">Why</th>
+        <th scope="col">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in rows %}
+      <tr data-open-tx="{{ t.id }}" tabindex="0" aria-label="Investigate {{ t.id }}">
+        <td style="color:var(--soc-text-muted);font-size:11px;white-space:nowrap;">{{ t.created|date:"d M H:i" }}</td>
+        <td class="text-mono" style="font-size:12px;">{{ t.id }}{% if t.simulated %}<span class="soc-sim-tag" title="Created with the demo Simulate panel">sim</span>{% endif %}</td>
+        <td>{{ t.sender_name }} → {{ t.recipient_name }}</td>
+        <td style="font-weight:600;white-space:nowrap;">{{ t.amount_display }}</td>
+        <td><span class="soc-risk-score">{{ t.score }} <span class="soc-badge {{ t.risk_level|lower }}">{{ t.risk_level }}</span></span></td>
+        <td>{% for f in t.top_factors %}<span class="soc-factor-chip">{{ f }}</span>{% empty %}<span style="color:var(--soc-text-muted);">—</span>{% endfor %}</td>
+        <td><span class="soc-badge {{ t.status_class }}">{{ t.status_label }}</span></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="soc-empty">{{ empty }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

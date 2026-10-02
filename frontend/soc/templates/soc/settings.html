@@ -1,0 +1,66 @@
+{% extends "soc/base_soc.html" %}
+{% block title %}Settings — SOC{% endblock %}
+{% block page_title %}Settings{% endblock %}
+{% block page_sub %}SOC dashboard configuration and preferences{% endblock %}
+
+{% block content %}
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+  <!-- General -->
+  <div class="soc-card">
+    <div class="soc-card-header"><div class="soc-card-title">General Settings</div></div>
+    <div class="soc-card-body">
+      <div class="soc-metric-row">
+        <span class="soc-metric-label">SOC Name</span>
+        <input type="text" class="soc-input" value="TheSafestBank SOC" style="width:200px;">
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label">Time Zone</span>
+        <select class="soc-select" style="width:200px;"><option>Asia/Kolkata (IST)</option><option>UTC</option></select>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label">Alert Poll Interval</span>
+        <select class="soc-select" style="width:200px;"><option>10 seconds</option><option>5 seconds</option><option>30 seconds</option></select>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label">Auto-refresh Dashboard</span>
+        <label class="soc-toggle"><input type="checkbox" checked><span class="soc-toggle-slider"></span></label>
+      </div>
+      <div style="margin-top:14px;">
+        <button class="soc-btn soc-btn-primary soc-btn-sm" onclick="showToast('Settings saved', 'success')">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="soc-card">
+    <div class="soc-card-header"><div class="soc-card-title">Notifications</div></div>
+    <div class="soc-card-body">
+      <div class="soc-metric-row">
+        <span class="soc-metric-label">Critical Alert Email</span>
+        <label class="soc-toggle"><input type="checkbox" checked><span class="soc-toggle-slider"></span></label>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label">High Alert Email</span>
+        <label class="soc-toggle"><input type="checkbox" checked><span class="soc-toggle-slider"></span></label>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label">Model Degradation Alert</span>
+        <label class="soc-toggle"><input type="checkbox" checked><span class="soc-toggle-slider"></span></label>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label">Daily Report Email</span>
+        <label class="soc-toggle"><input type="checkbox"><span class="soc-toggle-slider"></span></label>
+      </div>
+      <div class="soc-metric-row">
+        <span class="soc-metric-label">Recipient Email</span>
+        <input type="email" class="soc-input" placeholder="soc@thesafestbank.com" style="width:220px;">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+{% endblock %}

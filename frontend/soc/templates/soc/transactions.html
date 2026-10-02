@@ -1,0 +1,89 @@
+{% extends "soc/base_soc.html" %}
+{% load static %}
+{% block title %}Transaction Investigation — SOC{% endblock %}
+{% block page_title %}Transaction Investigation{% endblock %}
+{% block page_sub %}Search, filter and investigate flagged transactions{% endblock %}
+
+{% block content %}
+
+<!-- Filter Bar -->
+<form method="get" class="soc-card mb-4" style="margin-bottom:16px;">
+  <div class="soc-filter-bar">
+    <div class="soc-search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" name="q" class="soc-input" placeholder="Search TXN ID, account, merchant…" value="{{ search }}">
+    </div>
+    <select name="status" class="soc-select">
+      <option value="">All Status</option>
+      <option value="PENDING"   {% if status_filter == "PENDING"   %}selected{% endif %}>Pending</option>
+      <option value="REVIEWING" {% if status_filter == "REVIEWING" %}selected{% endif %}>Reviewing</option>
+      <option value="HELD"      {% if status_filter == "HELD"      %}selected{% endif %}>Held</option>
+      <option value="BLOCKED"   {% if status_filter == "BLOCKED"   %}selected{% endif %}>Blocked</option>
+      <option value="ALLOWED"   {% if status_filter == "ALLOWED"   %}selected{% endif %}>Allowed</option>
+      <option value="ESCALATED" {% if status_filter == "ESCALATED" %}selected{% endif %}>Escalated</option>
+    </select>
+    <select name="risk" class="soc-select">
+      <option value="">All Risk Levels</option>
+      <option value="CRITICAL" {% if risk_filter == "CRITICAL" %}selected{% endif %}>Critical</option>
+      <option value="HIGH"     {% if risk_filter == "HIGH"     %}selected{% endif %}>High</option>
+      <option value="MEDIUM"   {% if risk_filter == "MEDIUM"   %}selected{% endif %}>Medium</option>
+      <option value="LOW"      {% if risk_filter == "LOW"      %}selected{% endif %}>Low</option>
+    </select>
+    <button type="submit" class="soc-btn soc-btn-primary soc-btn-sm">Filter</button>
+    <a href="{% url 'soc:transactions' %}" class="soc-btn soc-btn-ghost soc-btn-sm">Clear</a>
+    <span style="margin-left:auto;font-size:11.5px;color:var(--soc-text-muted);">{{ transactions|length }} results</span>
+  </div>
+</form>
+
+<!-- Table -->
+<div class="soc-card">
+  <div class="soc-table-wrap" style="overflow-x:auto;">
+    <table class="soc-table">
+      <thead>
+        <tr>
+          <th>Transaction ID</th>
+          <th>Account</th>
+          <th>Amount</th>
+          <th>Channel</th>
+          <th>Merchant</th>
+          <th>Risk Score</th>
+          <th>Prediction</th>
+          <th>Confidence</th>
+          <th>Top Factors</th>
+          <th>Status</th>
+          <th>Time</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in transactions %}
+        <tr onclick="openPanel('{{ t.transaction_id }}')">
+          <td class="text-mono" style="color:var(--soc-amber);font-size:12px;">{{ t.transaction_id }}</td>
+          <td class="text-mono" style="font-size:12px;">{{ t.account_masked }}</td>
+          <td style="font-weight:600;">{{ t.amount }}</td>
+          <td style="color:var(--soc-text-muted);">{{ t.channel }}</td>
+          <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ t.merchant }}</td>
+          <td>
+            <span class="soc-risk-score {{ t.risk_level|lower }}">
+              {{ t.risk_score }}
+              <span class="soc-badge {{ t.risk_level|lower }}" style="margin-left:4px;">{{ t.risk_level }}</span>
+            </span>
+          </td>
+          <td><span class="soc-badge {{ t.prediction|lower }}">{{ t.prediction }}</span></td>
+          <td style="color:var(--soc-text-muted);">{{ t.model_confidence }}%</td>
+          <td>{% for f in t.top_factors %}<span class="soc-factor-chip">{{ f }}</span>{% endfor %}</td>
+          <td><span class="soc-badge {{ t.status|lower }}">{{ t.status }}</span></td>
+          <td style="color:var(--soc-text-muted);font-size:11px;white-space:nowrap;">{{ t.timestamp }}</td>
+          <td onclick="event.stopPropagation()">
+            <button class="soc-btn soc-btn-ghost soc-btn-sm" onclick="openPanel('{{ t.transaction_id }}')">Investigate</button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="12" class="soc-empty">No transactions match your filters</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

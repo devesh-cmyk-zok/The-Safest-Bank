@@ -1,0 +1,98 @@
+{% extends "soc/base_soc.html" %}
+{% block title %}Reports — SOC{% endblock %}
+{% block page_title %}Reports{% endblock %}
+{% block page_sub %}Generate and download security and fraud analysis reports{% endblock %}
+
+{% block content %}
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
+
+  <div class="soc-card">
+    <div class="soc-card-body">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13.5px;font-weight:700;">Daily Fraud Summary</div>
+        <span class="soc-badge medium" style="font-size:9.5px;">Today</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--soc-text-muted);margin-bottom:14px;line-height:1.6;">Comprehensive summary of all fraud detections and actions for the past 24 hours.</div>
+      <div style="display:flex;gap:6px;">
+        <button class="soc-btn soc-btn-primary soc-btn-sm" onclick="showToast('Generating Daily Fraud Summary…', 'info')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </button>
+        <button class="soc-btn soc-btn-ghost soc-btn-sm" onclick="showToast('Exporting as CSV…', 'info')">CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="soc-card">
+    <div class="soc-card-body">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13.5px;font-weight:700;">Weekly Risk Report</div>
+        <span class="soc-badge reviewing" style="font-size:9.5px;">This Week</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--soc-text-muted);margin-bottom:14px;line-height:1.6;">Aggregated risk analytics and trend analysis for the past 7 days.</div>
+      <div style="display:flex;gap:6px;">
+        <button class="soc-btn soc-btn-primary soc-btn-sm" onclick="showToast('Generating Weekly Risk Report…', 'info')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </button>
+        <button class="soc-btn soc-btn-ghost soc-btn-sm">CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="soc-card">
+    <div class="soc-card-body">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13.5px;font-weight:700;">Monthly Security Review</div>
+        <span class="soc-badge low" style="font-size:9.5px;">This Month</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--soc-text-muted);margin-bottom:14px;line-height:1.6;">Full security posture review including model performance and case outcomes.</div>
+      <div style="display:flex;gap:6px;">
+        <button class="soc-btn soc-btn-primary soc-btn-sm" onclick="showToast('Generating Monthly Security Review…', 'info')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </button>
+        <button class="soc-btn soc-btn-ghost soc-btn-sm">CSV</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="soc-card">
+    <div class="soc-card-body">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13.5px;font-weight:700;">Audit Trail Export</div>
+        <span class="soc-badge escalated" style="font-size:9.5px;">Last 7 Days</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--soc-text-muted);margin-bottom:14px;line-height:1.6;">Complete analyst action log with all transaction decisions and case updates.</div>
+      <div style="display:flex;gap:6px;">
+        <button class="soc-btn soc-btn-primary soc-btn-sm" onclick="showToast('Generating Audit Trail Export…', 'info')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </button>
+        <button class="soc-btn soc-btn-ghost soc-btn-sm">CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="soc-card">
+    <div class="soc-card-body">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13.5px;font-weight:700;">High-Risk Account Report</div>
+        <span class="soc-badge critical" style="font-size:9.5px;">Last 30 Days</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--soc-text-muted);margin-bottom:14px;line-height:1.6;">Ranked list of accounts with elevated risk scores and fraud alert history.</div>
+      <div style="display:flex;gap:6px;">
+        <button class="soc-btn soc-btn-primary soc-btn-sm" onclick="showToast('Generating High-Risk Account Report…', 'info')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </button>
+        <button class="soc-btn soc-btn-ghost soc-btn-sm">CSV</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

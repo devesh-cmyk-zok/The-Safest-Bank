@@ -1,0 +1,190 @@
+{% extends "soc/base_soc.html" %}
+{% block title %}Verification Queue — SOC{% endblock %}
+{% block page_title %}Verification Queue{% endblock %}
+{% block page_sub %}{{ queue|length }} transaction{{ queue|length|pluralize }} awaiting human verification{% endblock %}
+
+{% block content %}
+
+<!-- Header bar -->
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+  <div style="font-size:12px;color:var(--soc-text-muted);">
+    Transactions flagged by CNN-BiLSTM model pending analyst decision
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button class="soc-btn soc-btn-ghost soc-btn-sm">Sort by Risk ↓</button>
+    <button class="soc-btn soc-btn-ghost soc-btn-sm">Sort by Time</button>
+  </div>
+</div>
+
+<!-- Verification Card Grid -->
+<div class="soc-verification-grid">
+  {% for item in queue %}
+  <div class="soc-verify-card" id="card-{{ item.transaction_id }}">
+
+    <!-- ① Header: TXN ID + severity badge + time -->
+    <div class="soc-verify-top">
+      <div>
+        <div class="soc-verify-txn">{{ item.transaction_id }}</div>
+        <div class="soc-verify-account">{{ item.account_masked }}</div>
+      </div>
+      <div style="text-align:right;">
+        <span class="soc-badge {{ item.risk_level|lower }}">{{ item.risk_level }}</span>
+        <div class="soc-verify-time" style="margin-top:4px;">{{ item.minutes_ago }}m ago</div>
+      </div>
+    </div>
+
+    <!-- ② Amount -->
+    <div class="soc-verify-amount">{{ item.amount }}</div>
+
+    <!-- ③ Risk Score — enhanced with /100 + description -->
+    <div class="soc-verify-risk-block">
+      <div class="soc-verify-risk-row">
+        <span class="soc-verify-risk-label">Risk Score</span>
+        <span>
+          <span class="soc-verify-risk-num {{ item.risk_level|lower }}">{{ item.risk_score }}</span>
+          <span class="soc-verify-risk-out-of">/ 100</span>
+        </span>
+      </div>
+      <div class="soc-verify-risk-desc">{{ item.risk_description }}</div>
+      <!-- Coloured progress bar -->
+      <div class="soc-verify-bar-bg">
+        <div class="soc-verify-bar-fill {{ item.risk_level|lower }}" style="width:{{ item.risk_score }}%;"></div>
+      </div>
+    </div>
+
+    <!-- ④ Why Flagged section -->
+    {% if item.why_flagged %}
+    <div class="soc-why-flagged">
+      <div class="soc-why-title">Why Flagged</div>
+      {% for factor in item.why_flagged %}
+      <div class="soc-factor-row">
+        <div class="soc-factor-meta">
+          <span class="soc-factor-name" title="{{ factor.tooltip }}">
+            <span class="soc-factor-icon">{{ factor.icon }}</span>
+            {{ factor.name }}
+          </span>
+          <span class="soc-factor-pct">+{{ factor.contribution }}%</span>
+        </div>
+        <div class="soc-factor-bar-bg">
+          <div class="soc-factor-bar-fill {{ item.risk_level|lower }}" style="width:{{ factor.contribution }}%;"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ⑤ Model Reasoning — expandable -->
+    {% if item.model_reasoning %}
+    <button class="soc-reasoning-toggle" onclick="toggleReasoning(this)">
+      <span>View Model Reasoning</span>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="soc-reasoning-body">
+      <div class="soc-reasoning-model-label">CNN-BiLSTM — Model Reasoning</div>
+      <div class="soc-reasoning-text">{{ item.model_reasoning }}</div>
+      <div class="soc-reasoning-conf">
+        <span class="soc-reasoning-conf-label">Model Confidence</span>
+        <span class="soc-reasoning-conf-val">{{ item.model_confidence }}%</span>
+        <span style="margin-left:auto;font-size:10px;color:var(--soc-text-muted);">
+          Prediction:
+          <strong style="color:{% if item.prediction == 'FRAUD' %}var(--soc-critical){% else %}var(--soc-green){% endif %};">
+            {{ item.prediction }}
+          </strong>
+        </span>
+      </div>
+      {% if item.account_behaviour %}
+      <div style="margin-top:10px;">
+        <div class="soc-reasoning-model-label" style="margin-bottom:6px;">Account Behaviour Context</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;">
+          <div style="font-size:10px;color:var(--soc-text-muted);">Avg amount</div>
+          <div style="font-size:10px;color:var(--soc-text);font-weight:600;">{{ item.account_behaviour.avg_amount }}</div>
+          <div style="font-size:10px;color:var(--soc-text-muted);">Current</div>
+          <div style="font-size:10px;color:var(--soc-critical);font-weight:700;">{{ item.account_behaviour.current_amount }}</div>
+          <div style="font-size:10px;color:var(--soc-text-muted);">Avg tx/hr</div>
+          <div style="font-size:10px;color:var(--soc-text);font-weight:600;">{{ item.account_behaviour.avg_tx_per_hr }}</div>
+          <div style="font-size:10px;color:var(--soc-text-muted);">Current tx/hr</div>
+          <div style="font-size:10px;color:var(--soc-critical);font-weight:700;">{{ item.account_behaviour.current_tx_per_hr }}</div>
+          <div style="font-size:10px;color:var(--soc-text-muted);">Typical location</div>
+          <div style="font-size:10px;color:var(--soc-text);font-weight:600;">{{ item.account_behaviour.typical_location }}</div>
+          <div style="font-size:10px;color:var(--soc-text-muted);">Current location</div>
+          <div style="font-size:10px;color:{% if item.account_behaviour.current_location != item.account_behaviour.typical_location %}var(--soc-high){% else %}var(--soc-text){% endif %};font-weight:700;">{{ item.account_behaviour.current_location }}</div>
+          <div style="font-size:10px;color:var(--soc-text-muted);">Known devices</div>
+          <div style="font-size:10px;color:var(--soc-text);font-weight:600;">{{ item.account_behaviour.known_devices }}</div>
+          <div style="font-size:10px;color:var(--soc-text-muted);">Current device</div>
+          <div style="font-size:10px;color:{% if item.account_behaviour.current_device == 'Unknown' %}var(--soc-critical){% else %}var(--soc-green){% endif %};font-weight:700;">{{ item.account_behaviour.current_device }}</div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- ⑥ Action Buttons — unchanged -->
+    <div class="soc-verify-actions">
+      <button class="soc-btn soc-btn-success soc-btn-sm"
+              onclick="verifyAction('{{ item.transaction_id }}', 'ALLOW')">
+        ✓ Verify
+      </button>
+      <button class="soc-btn soc-btn-danger soc-btn-sm"
+              onclick="verifyAction('{{ item.transaction_id }}', 'BLOCK')">
+        ✗ Reject
+      </button>
+      <button class="soc-btn soc-btn-purple soc-btn-sm"
+              onclick="verifyAction('{{ item.transaction_id }}', 'ESCALATE')">
+        ↑ Escalate
+      </button>
+    </div>
+
+  </div>
+  {% empty %}
+  <div class="soc-empty" style="grid-column:1/-1;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M9 12l2 2 4-4"/><path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z"/>
+    </svg>
+    <div>No transactions pending verification</div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const CSRF = '{{ csrf_token }}';
+
+/* ── Action handler ─────────────────────────────────────────── */
+function verifyAction(txnId, action) {
+  const labels = { ALLOW: 'verified', BLOCK: 'rejected', ESCALATE: 'escalated to Security Case' };
+  fetch(`/soc/api/transaction/${txnId}/action/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+    body: JSON.stringify({ action })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      const msg = `Transaction ${txnId} ${labels[action] || d.new_status}.`;
+      showToast(msg, action === 'ESCALATE' ? 'info' : 'success');
+      // Fade out the card
+      const card = document.getElementById(`card-${txnId}`);
+      if (card) {
+        card.style.transition = 'opacity 0.4s, transform 0.4s';
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.97)';
+        setTimeout(() => card.remove(), 450);
+      }
+    } else {
+      showToast('Action failed — please try again.', 'error');
+    }
+  })
+  .catch(() => showToast('Network error. Please try again.', 'error'));
+}
+
+/* ── Model Reasoning toggle ─────────────────────────────────── */
+function toggleReasoning(btn) {
+  const body = btn.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+}
+</script>
+{% endblock %}

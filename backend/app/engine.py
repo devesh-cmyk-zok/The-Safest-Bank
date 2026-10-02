@@ -103,6 +103,14 @@ class FraudScoringEngine:
             "quarantine_triggered": status == EscrowStatus.ESCROW_HELD
         }
 
+        # Demo-reliable high-value hold so Send Money → OTP always triggers for large transfers
+        if amount >= 100000.0:
+            composite_score = max(composite_score, 0.82)
+            status = EscrowStatus.ESCROW_HELD
+            xai_breakdown["composite_score"] = composite_score
+            xai_breakdown["quarantine_triggered"] = True
+            xai_breakdown["demo_policy"] = "high_value_escrow_hold"
+
         return composite_score, status, xai_breakdown
 
 

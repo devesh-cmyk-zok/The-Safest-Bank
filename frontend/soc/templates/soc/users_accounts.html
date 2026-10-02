@@ -1,0 +1,60 @@
+{% extends "soc/base_soc.html" %}
+{% block title %}Users & Accounts — SOC{% endblock %}
+{% block page_title %}Users & Accounts{% endblock %}
+{% block page_sub %}Account monitoring and risk profiling{% endblock %}
+
+{% block content %}
+
+<!-- Search -->
+<form method="get" class="soc-card" style="margin-bottom:16px;">
+  <div class="soc-filter-bar">
+    <div class="soc-search-wrap" style="max-width:400px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" name="q" class="soc-input" placeholder="Search account number, user name…" value="{{ search }}">
+    </div>
+    <button type="submit" class="soc-btn soc-btn-primary soc-btn-sm">Search</button>
+    {% if search %}<a href="{% url 'soc:users_accounts' %}" class="soc-btn soc-btn-ghost soc-btn-sm">Clear</a>{% endif %}
+    <span style="margin-left:auto;font-size:11.5px;color:var(--soc-text-muted);">{{ accounts|length }} accounts</span>
+  </div>
+</form>
+
+<!-- Account Cards -->
+<div class="soc-account-grid">
+  {% for acct in accounts %}
+  <div class="soc-account-card" onclick="showToast('{{ acct.account_masked }} — view coming soon', 'info')">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">
+      <div>
+        <div class="soc-account-num">{{ acct.account_masked }}</div>
+        <div class="soc-account-name">{{ acct.user_name }}</div>
+      </div>
+      <span class="soc-badge {% if acct.status == 'active' %}low{% elif acct.status == 'suspended' %}medium{% elif acct.status == 'frozen' %}high{% else %}pending{% endif %}">
+        {{ acct.status|capfirst }}
+      </span>
+    </div>
+    <div class="soc-account-row">
+      <span>Account Type</span>
+      <span>{{ acct.account_type|capfirst }}</span>
+    </div>
+    <div class="soc-account-row">
+      <span>Risk Score</span>
+      <span class="soc-risk-score {% if acct.risk_score >= 80 %}critical{% elif acct.risk_score >= 60 %}high{% elif acct.risk_score >= 40 %}medium{% else %}low{% endif %}">{{ acct.risk_score }}</span>
+    </div>
+    <!-- Risk bar -->
+    <div style="height:3px;background:var(--soc-border);border-radius:2px;margin:8px 0;">
+      <div style="height:100%;width:{{ acct.risk_score }}%;border-radius:2px;background:{% if acct.risk_score >= 80 %}var(--soc-critical){% elif acct.risk_score >= 60 %}var(--soc-high){% elif acct.risk_score >= 40 %}var(--soc-medium){% else %}var(--soc-low){% endif %};"></div>
+    </div>
+    <div class="soc-account-row">
+      <span>Recent Transactions</span>
+      <span>{{ acct.recent_tx_count }}</span>
+    </div>
+    <div class="soc-account-row">
+      <span>Fraud Alerts</span>
+      <span style="{% if acct.fraud_alerts_count > 0 %}color:var(--soc-critical){% endif %};">{{ acct.fraud_alerts_count }}</span>
+    </div>
+  </div>
+  {% empty %}
+  <div class="soc-empty" style="grid-column:1/-1;">No accounts found</div>
+  {% endfor %}
+</div>
+
+{% endblock %}

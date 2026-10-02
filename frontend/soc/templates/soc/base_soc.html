@@ -1,0 +1,302 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}SOC — TheSafestBank{% endblock %}</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230D1525'/%3E%3Cpath fill='%23F59E0B' d='M16 4l8 3v7c0 6-3.5 9.5-8 11-4.5-1.5-8-5-8-11V7l8-3z'/%3E%3Ctext x='16' y='20' font-family='Arial' font-weight='800' font-size='12' fill='%230D1525' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="{% static 'soc/css/soc.css' %}">
+{% block extra_css %}{% endblock %}
+</head>
+<body class="soc-body">
+
+<div class="soc-shell">
+
+  <!-- ═══ SIDEBAR ════════════════════════════════════════════ -->
+  <aside class="soc-sidebar" id="socSidebar">
+
+    <!-- Brand -->
+    <div class="soc-brand">
+      <div class="soc-brand-logo">
+        <img src="{% static 'portal/images/logo.jpeg' %}" alt="TheSafestBank">
+        <div>
+          <div class="soc-brand-title">TheSafestBank</div>
+          <div class="soc-brand-sub">Security Operations</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <div class="soc-nav-scroll">
+
+      <div class="soc-nav-group">
+        <div class="soc-nav-label">Operations</div>
+        <a href="{% url 'soc:dashboard' %}" class="soc-nav-link {% if page == 'dashboard' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          Fraud Dashboard
+        </a>
+        <a href="{% url 'soc:transactions' %}" class="soc-nav-link {% if page == 'transactions' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 12h6M9 16h4M7 3h8l3 3v15H7z"/></svg>
+          Transaction Investigation
+        </a>
+        <a href="{% url 'soc:alerts' %}" class="soc-nav-link {% if page == 'alerts' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Live Alerts
+          <span class="soc-nav-badge" id="sidebarAlertCount">10</span>
+        </a>
+      </div>
+
+      <div class="soc-nav-group">
+        <div class="soc-nav-label">Analytics</div>
+        <a href="{% url 'soc:analytics' %}" class="soc-nav-link {% if page == 'analytics' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="M18 17l-5-5-4 3-4-4"/></svg>
+          Risk Analytics
+        </a>
+      </div>
+
+      <div class="soc-nav-group">
+        <div class="soc-nav-label">Security</div>
+        <a href="{% url 'soc:cases' %}" class="soc-nav-link {% if page == 'cases' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          Security Cases
+          <span class="soc-nav-badge amber">3</span>
+        </a>
+        <a href="{% url 'soc:verification' %}" class="soc-nav-link {% if page == 'verification' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 12l2 2 4-4"/><path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z"/></svg>
+          Verification Queue
+          <span class="soc-nav-badge blue">7</span>
+        </a>
+        <a href="{% url 'soc:users_accounts' %}" class="soc-nav-link {% if page == 'users_accounts' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Users & Accounts
+        </a>
+        <a href="{% url 'soc:audit_logs' %}" class="soc-nav-link {% if page == 'audit_logs' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Audit Logs
+        </a>
+      </div>
+
+      <div class="soc-nav-group">
+        <div class="soc-nav-label">System</div>
+        <a href="{% url 'soc:reports' %}" class="soc-nav-link {% if page == 'reports' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h8l3 3v15H7z"/><path d="M10 8h4M10 12h4M10 16h2"/></svg>
+          Reports
+        </a>
+        <a href="{% url 'soc:settings' %}" class="soc-nav-link {% if page == 'settings' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          Settings
+        </a>
+      </div>
+
+    </div><!-- /soc-nav-scroll -->
+
+    <!-- Footer / Analyst -->
+    <div class="soc-sidebar-footer">
+      <div class="soc-analyst-row">
+        <div class="soc-avatar">{{ user.username|first|upper }}</div>
+        <div class="soc-analyst-info">
+          <div class="name">{{ user.get_full_name|default:user.username }}</div>
+          <div class="role">Level 2 Security Analyst</div>
+        </div>
+      </div>
+      <a href="{% url 'admin:logout' %}" class="soc-logout-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </a>
+    </div>
+
+  </aside><!-- /soc-sidebar -->
+
+  <!-- ═══ MAIN ════════════════════════════════════════════════ -->
+  <main class="soc-main">
+
+    <!-- Top Bar -->
+    <div class="soc-topbar">
+      <div class="soc-topbar-left">
+        <div class="soc-page-title">{% block page_title %}Dashboard{% endblock %}</div>
+        <div class="soc-page-sub">{% block page_sub %}{% endblock %}</div>
+      </div>
+      <div class="soc-topbar-right">
+        <span class="soc-last-updated" id="lastUpdated">
+          Updated: {{ now|date:"d M Y, H:i" }}
+        </span>
+        <div class="soc-online-badge">Model Online</div>
+        {% block topbar_extra %}{% endblock %}
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="soc-content">
+      {% block content %}{% endblock %}
+    </div>
+
+  </main>
+
+</div><!-- /soc-shell -->
+
+<!-- Toast Container -->
+<div id="soc-toast-container"></div>
+
+<!-- Investigation Panel -->
+<div class="soc-panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+<div class="soc-investigation-panel" id="investigationPanel">
+  <div class="soc-panel-header">
+    <span class="soc-panel-title">Transaction Investigation</span>
+    <button class="soc-panel-close" onclick="closePanel()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="soc-panel-body" id="panelBody">
+    <div class="soc-empty">Select a transaction to investigate</div>
+  </div>
+</div>
+
+{% block extra_js %}{% endblock %}
+
+<script>
+// ── Toast utility ────────────────────────────────────────────
+function showToast(msg, type = 'info') {
+  const c = document.getElementById('soc-toast-container');
+  const t = document.createElement('div');
+  t.className = `soc-toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ── Investigation Panel ──────────────────────────────────────
+const CSRF = '{{ csrf_token }}';
+
+function openPanel(txnId) {
+  const panel   = document.getElementById('investigationPanel');
+  const overlay = document.getElementById('panelOverlay');
+  const body    = document.getElementById('panelBody');
+  body.innerHTML = '<div class="soc-empty">Loading…</div>';
+  panel.classList.add('open');
+  overlay.classList.add('open');
+
+  fetch(`/soc/api/transaction/${txnId}/`)
+    .then(r => r.json())
+    .then(data => renderPanel(data))
+    .catch(() => { body.innerHTML = '<div class="soc-empty">Failed to load transaction.</div>'; });
+}
+
+function closePanel() {
+  document.getElementById('investigationPanel').classList.remove('open');
+  document.getElementById('panelOverlay').classList.remove('open');
+}
+
+function riskClass(level) {
+  const m = { CRITICAL: 'critical', HIGH: 'high', MEDIUM: 'medium', LOW: 'low' };
+  return m[level] || 'low';
+}
+
+function renderPanel(d) {
+  if (!d.found) {
+    document.getElementById('panelBody').innerHTML = '<div class="soc-empty">Transaction not found.</div>';
+    return;
+  }
+  const rc = riskClass(d.risk_level);
+  const shapBars = (d.shap || []).map(s => `
+    <div class="soc-shap-item">
+      <div class="soc-shap-row">
+        <span class="soc-shap-name">${s.feature_name}</span>
+        <span class="soc-shap-pct">+${s.contribution_pct.toFixed(0)}%</span>
+      </div>
+      <div class="soc-shap-bar-bg">
+        <div class="soc-shap-bar-fill" style="width:${s.contribution_pct}%"></div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('panelBody').innerHTML = `
+    <div class="soc-risk-large ${rc}">
+      <div>
+        <div style="font-size:10px;color:var(--soc-text-muted);margin-bottom:2px;">RISK SCORE</div>
+        <div class="score">${d.risk_score} <span style="font-size:14px;opacity:.5">/ 100</span></div>
+      </div>
+      <div style="margin-left:auto;text-align:right;">
+        <span class="soc-badge ${rc}">${d.risk_level}</span><br>
+        <span style="font-size:10px;color:var(--soc-text-muted);margin-top:4px;display:block;">Confidence: ${d.model_confidence}%</span>
+      </div>
+    </div>
+
+    <div class="soc-detail-grid">
+      <div class="soc-detail-item">
+        <div class="label">Transaction ID</div>
+        <div class="value text-mono">${d.transaction_id}</div>
+      </div>
+      <div class="soc-detail-item">
+        <div class="label">Prediction</div>
+        <div class="value"><span class="soc-badge ${d.prediction === 'FRAUD' ? 'fraud' : 'legitimate'}">${d.prediction}</span></div>
+      </div>
+      <div class="soc-detail-item">
+        <div class="label">Account</div>
+        <div class="value text-mono">${d.account_masked}</div>
+      </div>
+      <div class="soc-detail-item">
+        <div class="label">Amount</div>
+        <div class="value">${d.amount}</div>
+      </div>
+      <div class="soc-detail-item">
+        <div class="label">Channel</div>
+        <div class="value">${d.channel}</div>
+      </div>
+      <div class="soc-detail-item">
+        <div class="label">Merchant</div>
+        <div class="value">${d.merchant}</div>
+      </div>
+      <div class="soc-detail-item full">
+        <div class="label">Timestamp</div>
+        <div class="value">${d.timestamp}</div>
+      </div>
+      <div class="soc-detail-item full">
+        <div class="label">Status</div>
+        <div class="value"><span class="soc-badge ${d.status.toLowerCase()}">${d.status}</span></div>
+      </div>
+    </div>
+
+    <div class="soc-divider"></div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--soc-text-muted);margin-bottom:10px;">
+      Why was this flagged?
+    </div>
+    <div class="soc-shap-list">${shapBars}</div>
+
+    <div class="soc-action-row">
+      <button class="soc-btn soc-btn-success soc-btn-sm" onclick="txnAction('${d.transaction_id}','ALLOW')">✓ Allow</button>
+      <button class="soc-btn soc-btn-warning soc-btn-sm" onclick="txnAction('${d.transaction_id}','HOLD')">⏸ Hold</button>
+      <button class="soc-btn soc-btn-danger soc-btn-sm"  onclick="txnAction('${d.transaction_id}','BLOCK')">✗ Block</button>
+      <button class="soc-btn soc-btn-purple soc-btn-sm"  onclick="txnAction('${d.transaction_id}','ESCALATE')">↑ Escalate</button>
+    </div>`;
+}
+
+function txnAction(txnId, action) {
+  fetch(`/soc/api/transaction/${txnId}/action/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+    body: JSON.stringify({ action })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      showToast(`Transaction ${txnId} → ${d.new_status}`, 'success');
+      closePanel();
+    } else {
+      showToast('Action failed', 'error');
+    }
+  })
+  .catch(() => showToast('Network error', 'error'));
+}
+
+// Update timestamp
+function refreshTimestamp() {
+  const el = document.getElementById('lastUpdated');
+  if (el) {
+    const now = new Date();
+    el.textContent = `Updated: ${now.toLocaleString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}`;
+  }
+}
+</script>
+
+</body>
+</html>

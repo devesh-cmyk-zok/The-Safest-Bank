@@ -1,0 +1,101 @@
+/* ============================================================
+   Reuses sidebar/topbar/badge/button styles from transfer.css.
+   Only Fraud Shield page-specific components live here.
+   ============================================================ */
+
+.fs-main{ padding:32px 42px 70px; width:100%; }
+
+/* --- Header --- */
+.fs-header{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:22px; gap:16px; flex-wrap:wrap; }
+.fs-header h1{ font-size:22px; font-weight:700; letter-spacing:-.3px; font-family:var(--font-display); }
+.fs-header p{ font-size:var(--fs-sm); color:var(--text-muted); margin-top:4px; }
+
+.fs-status-pill{
+  display:flex; align-items:center; gap:10px; padding:9px 16px; border-radius:14px;
+  background:var(--safe-bg); flex-shrink:0;
+}
+.fs-status-pill .dot{ width:9px; height:9px; border-radius:50%; background:var(--safe); flex-shrink:0; }
+.fs-status-pill .t{ font-size:12.5px; font-weight:700; color:var(--safe); }
+.fs-status-pill .s{ font-size:10.5px; color:var(--text-muted); }
+.fs-status-pill.review{ background:var(--review-bg); }
+.fs-status-pill.review .dot{ background:var(--review); }
+.fs-status-pill.review .t{ color:var(--review); }
+.fs-status-pill.action{ background:var(--blocked-bg); }
+.fs-status-pill.action .dot{ background:var(--blocked); }
+.fs-status-pill.action .t{ color:var(--blocked); }
+
+/* --- Grid rows --- */
+.fs-row{ display:grid; grid-template-columns:minmax(0, 1.55fr) minmax(340px, 0.85fr); gap:24px; margin-bottom:0; align-items:start; }
+.fs-col{ display:flex; flex-direction:column; gap:20px; }
+
+.fs-card{ background:var(--card); border:1px solid var(--line); border-radius:var(--r-lg); box-shadow:var(--shadow-card); padding:22px 24px; }
+.fs-card-title{ font-size:11px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--text-muted); margin-bottom:14px; }
+
+/* --- Main protection card: compact, info-first, small static shield --- */
+.fs-protect-head{ display:flex; align-items:center; gap:9px; font-size:14px; font-weight:700; color:var(--text); }
+.fs-protect-head svg{ width:19px; height:19px; color:var(--brand); flex-shrink:0; }
+
+.fs-protect-status-row{ display:flex; align-items:baseline; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.fs-big-status{ font-size:17px; font-weight:700; color:var(--safe); letter-spacing:.3px; }
+.fs-big-status.review{ color:var(--review); }
+.fs-big-status.action{ color:var(--blocked); }
+.fs-protect-desc{ font-size:12.5px; color:var(--text-muted); }
+
+.fs-mini-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px; }
+.fs-mini-stat{ padding:11px 13px; background:var(--bg); border-radius:11px; }
+.fs-mini-stat .k{ font-size:10.5px; color:var(--text-muted); }
+.fs-mini-stat .v{ font-size:13px; font-weight:700; margin-top:2px; }
+.fs-mini-stat .v.safe{ color:var(--safe); }
+.fs-mini-stat .v.muted{ color:var(--text-muted); font-weight:600; }
+
+/* --- How you're protected: compact 2-column checklist --- */
+.fs-checklist-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; }
+.fs-check-item{ display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--text); transition:opacity .15s ease; }
+.fs-check-item:hover{ opacity:.75; }
+.fs-check-item .mark{
+  width:18px; height:18px; border-radius:50%; background:var(--safe-bg); color:var(--safe);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.fs-check-item .mark svg{ width:10px; height:10px; }
+
+/* --- Recent security activity --- */
+.fs-activity-item{ display:flex; align-items:flex-start; gap:11px; padding:11px 2px; border-bottom:1px solid var(--line-soft); }
+.fs-activity-item:last-of-type{ border-bottom:none; }
+.fs-activity-icon{ width:30px; height:30px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+.fs-activity-icon svg{ width:14px; height:14px; }
+.fs-activity-icon.safe{ background:var(--safe-bg); color:var(--safe); }
+.fs-activity-icon.review{ background:var(--review-bg); color:var(--review); }
+.fs-activity-icon.blocked{ background:var(--blocked-bg); color:var(--blocked); }
+.fs-activity-title{ font-size:12.5px; font-weight:650; }
+.fs-activity-meta{ font-size:11px; color:var(--text-muted); margin-top:2px; }
+
+.fs-view-all{
+  display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:650; color:var(--brand);
+  margin-top:14px; cursor:pointer; transition:gap .15s ease;
+}
+.fs-view-all svg{ width:13px; height:13px; transition:transform .15s ease; }
+.fs-view-all:hover svg{ transform:translateX(3px); }
+
+/* --- This month stats --- */
+.fs-stats-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.fs-stat{ text-align:center; padding:14px 8px; background:var(--bg); border-radius:12px; }
+.fs-stat .num{ font-size:24px; font-weight:700; font-family:var(--font-mono); }
+.fs-stat .num.safe{ color:var(--safe); }
+.fs-stat .num.review{ color:var(--review); }
+.fs-stat .num.blocked{ color:var(--blocked); }
+.fs-stat .lbl{ font-size:10.5px; color:var(--text-muted); margin-top:4px; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1080px){
+  .fs-row{ grid-template-columns:1fr; }
+}
+@media (max-width: 768px){
+  .fs-main{ padding:20px 16px 60px; }
+  .fs-header{ flex-direction:column; }
+  .fs-mini-grid{ grid-template-columns:1fr 1fr; }
+  .fs-checklist-grid{ grid-template-columns:1fr; }
+  .fs-stats-grid{ grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  .fs-stat .num{ font-size:19px; }
+}

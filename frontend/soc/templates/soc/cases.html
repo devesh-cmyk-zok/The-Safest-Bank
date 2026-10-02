@@ -1,0 +1,73 @@
+{% extends "soc/base_soc.html" %}
+{% block title %}Security Cases — SOC{% endblock %}
+{% block page_title %}Security Cases{% endblock %}
+{% block page_sub %}Active investigations and case management{% endblock %}
+
+{% block content %}
+
+<!-- Status Tabs -->
+<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
+  <a href="{% url 'soc:cases' %}" class="soc-btn {% if not status_filter %}soc-btn-primary{% else %}soc-btn-ghost{% endif %} soc-btn-sm">All</a>
+  <a href="{% url 'soc:cases' %}?status=OPEN" class="soc-btn {% if status_filter == 'OPEN' %}soc-btn-primary{% else %}soc-btn-ghost{% endif %} soc-btn-sm">Open</a>
+  <a href="{% url 'soc:cases' %}?status=INVESTIGATING" class="soc-btn {% if status_filter == 'INVESTIGATING' %}soc-btn-primary{% else %}soc-btn-ghost{% endif %} soc-btn-sm">Investigating</a>
+  <a href="{% url 'soc:cases' %}?status=ESCALATED" class="soc-btn {% if status_filter == 'ESCALATED' %}soc-btn-primary{% else %}soc-btn-ghost{% endif %} soc-btn-sm">Escalated</a>
+  <a href="{% url 'soc:cases' %}?status=RESOLVED" class="soc-btn {% if status_filter == 'RESOLVED' %}soc-btn-primary{% else %}soc-btn-ghost{% endif %} soc-btn-sm">Resolved</a>
+  <a href="{% url 'soc:cases' %}?status=CLOSED" class="soc-btn {% if status_filter == 'CLOSED' %}soc-btn-primary{% else %}soc-btn-ghost{% endif %} soc-btn-sm">Closed</a>
+</div>
+
+<!-- Cases Table -->
+<div class="soc-card">
+  <div class="soc-card-header">
+    <div>
+      <div class="soc-card-title">Investigation Cases</div>
+      <div class="soc-card-sub">{{ cases|length }} cases</div>
+    </div>
+    <button class="soc-btn soc-btn-primary soc-btn-sm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Case
+    </button>
+  </div>
+  <div class="soc-table-wrap">
+    <table class="soc-table">
+      <thead>
+        <tr>
+          <th>Case ID</th>
+          <th>Severity</th>
+          <th>Title</th>
+          <th>Account</th>
+          <th>Transactions</th>
+          <th>Assigned Analyst</th>
+          <th>Created</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for case in cases %}
+        <tr>
+          <td class="text-mono" style="color:var(--soc-amber);font-size:12px;">{{ case.case_id }}</td>
+          <td><span class="soc-badge {{ case.severity|lower }}">{{ case.severity }}</span></td>
+          <td style="max-width:260px;font-weight:500;">{{ case.title }}</td>
+          <td class="text-mono" style="font-size:12px;">{{ case.account }}</td>
+          <td style="color:var(--soc-text-muted);text-align:center;">{{ case.transactions_count }}</td>
+          <td style="color:var(--soc-text-muted);">{{ case.assigned_analyst }}</td>
+          <td style="color:var(--soc-text-muted);font-size:11px;white-space:nowrap;">{{ case.created_at }}</td>
+          <td><span class="soc-badge {{ case.status|lower }}">{{ case.status }}</span></td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              <button class="soc-btn soc-btn-ghost soc-btn-sm">Open</button>
+              {% if case.status == 'OPEN' or case.status == 'INVESTIGATING' %}
+              <button class="soc-btn soc-btn-purple soc-btn-sm">Escalate</button>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9" class="soc-empty">No cases found</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

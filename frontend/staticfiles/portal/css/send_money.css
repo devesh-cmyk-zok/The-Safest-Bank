@@ -1,0 +1,250 @@
+/* ============================================================
+   This file adds ONLY the components unique to the Transfer flow.
+   Sidebar, topbar, inputs, buttons, badges, modal, and toast styles
+   are inherited from transfer.css (linked alongside this file) so
+   this page visually matches the dashboard without duplicating CSS.
+   ============================================================ */
+
+.tf-main{ padding:36px 42px 70px; max-width:900px; }
+
+.tf-header{ margin-bottom:22px; }
+.tf-header h1{ font-size:24px; font-weight:700; letter-spacing:-.3px; font-family:var(--font-display); }
+.tf-header p{ font-size:var(--fs-sm); color:var(--text-muted); margin-top:4px; }
+
+/* --- Demo scenario selector (temporary, for hackathon demo only) --- */
+.demo-panel{
+  display:flex; align-items:center; gap:10px; background:var(--brand-tint, var(--pink-light));
+  border:1px dashed var(--brand); border-radius:12px; padding:10px 14px; margin-bottom:22px;
+  font-size:12px;
+}
+.demo-panel .lbl{ font-weight:700; color:var(--brand-dark); }
+.demo-panel select{
+  border:1px solid var(--line); border-radius:8px; padding:6px 10px; font-size:12px;
+  background:#fff; color:var(--text); font-family:inherit; cursor:pointer;
+}
+.demo-panel .tag{ font-size:10px; color:var(--text-muted); margin-left:auto; }
+
+/* --- Step indicator --- */
+.step-indicator{ display:flex; align-items:center; gap:6px; margin-bottom:24px; }
+.step-indicator .step{
+  display:flex; align-items:center; gap:7px; font-size:11.5px; font-weight:650; color:var(--text-muted);
+}
+.step-indicator .dot{
+  width:22px; height:22px; border-radius:50%; background:var(--line-soft); color:var(--text-muted);
+  display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;
+  transition:background .2s ease, color .2s ease;
+}
+.step-indicator .step.done .dot{ background:var(--safe); color:#fff; }
+.step-indicator .step.active .dot{ background:var(--brand); color:#fff; }
+.step-indicator .step.active{ color:var(--text); }
+.step-indicator .connector{ width:26px; height:1.5px; background:var(--line); }
+
+/* --- Screens (shown/hidden via JS) --- */
+.screen{ display:none; }
+.screen.active{ display:block; animation:screenIn .25s ease; }
+@keyframes screenIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+
+/* --- Input screen: two-pane like dashboard's mini form --- */
+.tf-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:18px; }
+.tf-card{ background:var(--card); border:1px solid var(--line); border-radius:var(--r-lg); box-shadow:var(--shadow-card); padding:26px; }
+.tf-section-title{ font-size:14px; font-weight:700; margin-bottom:14px; }
+.tf-section{ margin-bottom:26px; }
+.tf-section:last-of-type{ margin-bottom:0; }
+
+.verify-check{
+  display:flex; align-items:center; gap:6px; font-size:11.5px; font-weight:650; color:var(--safe);
+  margin-top:8px; opacity:0; transition:opacity .2s ease;
+}
+.verify-check.show{ opacity:1; }
+.verify-check svg{ width:13px; height:13px; }
+
+.balance-line{
+  display:flex; justify-content:space-between; align-items:center; font-size:12px;
+  color:var(--text-muted); margin-top:6px; padding-top:10px; border-top:1px solid var(--line-soft);
+}
+.balance-line .bl-val{ font-family:var(--font-mono); font-weight:650; color:var(--text); transition:filter .2s ease; }
+.balance-line .eye-mini{ background:none; border:none; cursor:pointer; color:var(--text-muted); display:flex; padding:2px; }
+.balance-line .eye-mini svg{ width:14px; height:14px; }
+
+/* --- Review screen --- */
+.review-card{ max-width:480px; margin:0 auto; }
+.review-title{ text-align:center; font-size:18px; font-weight:700; margin-bottom:20px; }
+.review-row{ display:flex; justify-content:space-between; padding:13px 0; border-bottom:1px solid var(--line-soft); font-size:13.5px; }
+.review-row:last-child{ border-bottom:none; }
+.review-row .k{ color:var(--text-muted); }
+.review-row .v{ font-weight:650; text-align:right; }
+.review-actions{ display:flex; gap:10px; margin-top:22px; }
+.review-actions button{ flex:1; }
+button.secondary{
+  padding:13px; border-radius:12px; background:var(--bg); border:1.5px solid var(--line);
+  color:var(--text); font-size:14px; font-weight:650; cursor:pointer; transition:background .15s ease;
+}
+button.secondary:hover{ background:var(--line-soft); }
+
+/* --- Security check screen --- */
+.sec-check-card{ max-width:440px; margin:0 auto; text-align:center; }
+.sec-check-icon{
+  width:56px; height:56px; border-radius:50%; background:var(--brand-tint, var(--pink-light));
+  display:flex; align-items:center; justify-content:center; margin:0 auto 16px;
+}
+.sec-check-icon svg{ width:26px; height:26px; color:var(--brand); }
+.sec-check-card h2{ font-size:17px; font-weight:700; }
+.sec-check-card p{ font-size:12.5px; color:var(--text-muted); margin-top:4px; }
+.sec-subtitle{ font-size:13.5px !important; font-weight:650; color:var(--text) !important; margin-top:2px !important; }
+
+.sec-divider{ height:1px; background:var(--line-soft); margin:18px 0 14px; }
+.sec-analyzing-label{ font-size:11.5px; font-weight:650; color:var(--text-muted); text-align:left; margin-bottom:6px; }
+
+.check-list{ margin-top:6px; text-align:left; }
+.check-item{
+  display:flex; align-items:center; gap:10px; padding:10px 4px; font-size:13px; color:var(--text-muted);
+  opacity:.4; transition:opacity .3s ease;
+}
+.check-item.done{ opacity:1; color:var(--text); }
+.check-item .mark{
+  width:20px; height:20px; border-radius:50%; border:1.5px solid var(--line); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; transition:background .2s ease, border-color .2s ease;
+}
+.check-item.done .mark{ background:var(--safe); border-color:var(--safe); }
+.check-item .mark svg{ width:11px; height:11px; color:#fff; opacity:0; transition:opacity .15s ease; }
+.check-item.done .mark svg{ opacity:1; }
+
+.sec-progress-label{ font-size:11px; font-weight:650; color:var(--text-muted); margin-top:20px; text-align:left; }
+.sec-progress{ height:5px; background:var(--line-soft); border-radius:4px; margin-top:6px; overflow:hidden; }
+.sec-progress-fill{ height:100%; background:var(--brand); width:0%; transition:width .4s ease; border-radius:4px; }
+
+/* --- Risk outcome screens --- */
+.outcome-card{
+  max-width:580px;
+  width:100%;
+  margin:0 auto;
+  text-align:center;
+  box-sizing:border-box;
+}
+.outcome-icon{
+  width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;
+}
+.outcome-icon.safe{ background:var(--safe-bg); }
+.outcome-icon.blocked{ background:var(--blocked-bg); }
+.outcome-icon svg{ width:28px; height:28px; }
+.outcome-icon.safe svg{ color:var(--safe); }
+.outcome-icon.blocked svg{ color:var(--blocked); }
+
+.outcome-card h2{ font-size:18px; font-weight:700; }
+.outcome-card .oc-msg{ font-size:13px; color:var(--text-muted); margin-top:8px; line-height:1.6; }
+
+.outcome-stats{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:10px;
+  margin-top:20px;
+  width:100%;
+  box-sizing:border-box;
+}
+.outcome-stat{
+  background:var(--bg);
+  border-radius:12px;
+  padding:12px 8px;
+  min-width:0;
+  box-sizing:border-box;
+  overflow-wrap:break-word;
+  word-break:break-word;
+}
+.outcome-stat.full-width{
+  grid-column: 1 / -1;
+}
+.outcome-stat .k{
+  font-size:10.5px;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  overflow-wrap:break-word;
+}
+.outcome-stat .v{
+  font-size:13px;
+  font-weight:700;
+  margin-top:3px;
+  overflow-wrap:break-word;
+  word-break:break-word;
+}
+.outcome-stat .v.v-safe{ color:var(--safe); }
+.outcome-stat .v.v-blocked{ color:var(--blocked); }
+
+.risk-score-badge{
+  display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:20px;
+  background:var(--blocked-bg); color:var(--blocked); font-weight:700; font-size:15px; margin-top:16px;
+}
+.risk-score-badge.safe{ background:var(--safe-bg); color:var(--safe); }
+.risk-score-badge .score-num{ font-family:var(--font-mono); font-size:19px; }
+.risk-score-badge .score-label{ font-size:10.5px; font-weight:700; letter-spacing:.4px; padding:3px 8px; border-radius:20px; background:var(--blocked); color:#fff; }
+.risk-score-badge .score-label.safe{ background:var(--safe); }
+
+.reasons-box{ text-align:left; background:var(--bg); border-radius:12px; padding:14px 16px; margin-top:18px; }
+.reasons-box .rb-title{ font-size:11.5px; font-weight:700; color:var(--text-muted); margin-bottom:8px; }
+.reasons-box ul{ margin:0; padding-left:18px; font-size:12.5px; color:var(--text); line-height:1.7; }
+.reasons-list-icon{ list-style:none !important; padding-left:0 !important; }
+.reasons-list-icon li{ display:flex; align-items:flex-start; gap:8px; margin-bottom:6px; }
+.reasons-list-icon li svg{ width:14px; height:14px; color:var(--review); flex-shrink:0; margin-top:1px; }
+
+.held-block{ margin-top:18px; }
+.held-title{ font-size:13.5px; font-weight:700; margin-top:10px; }
+.held-sub{ font-size:12px; color:var(--text-muted); margin-top:3px; }
+
+.held-pill{
+  display:inline-flex; align-items:center; gap:6px; font-size:10.5px; font-weight:700; letter-spacing:.4px;
+  padding:5px 12px; border-radius:20px; background:var(--review-bg); color:var(--review);
+}
+.held-pill .dot{ width:6px; height:6px; border-radius:50%; background:var(--review); }
+
+.held-actions{ display:flex; gap:10px; margin-top:20px; }
+.held-actions button{ flex:1; }
+
+/* --- Success screen shield line --- */
+.shield-line{
+  display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; font-weight:650;
+  color:var(--safe); margin-top:16px;
+}
+.shield-line svg{ width:14px; height:14px; }
+
+/* --- OTP modal footer badge --- */
+.otp-shield-footer{
+  display:flex; align-items:center; justify-content:center; gap:6px; font-size:11px; color:var(--text-muted);
+  margin-top:14px;
+}
+.otp-shield-footer svg{ width:13px; height:13px; color:var(--brand); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px){
+  .tf-grid{ grid-template-columns:1fr; }
+}
+@media (max-width: 768px){
+  .tf-main{ padding:20px 16px 60px; }
+  .review-actions{ flex-direction:column; }
+  .held-actions{ flex-direction:column; }
+}
+@media (max-width: 640px){
+  .outcome-stats{
+    grid-template-columns:repeat(2, 1fr);
+  }
+}
+@media (max-width: 480px){
+  .tf-card{ padding:20px; }
+  .step-indicator .connector{ width:14px; }
+  .outcome-stats{
+    grid-template-columns:repeat(2, 1fr);
+    gap:8px;
+  }
+  .outcome-stat{
+    padding:10px 6px;
+  }
+  .outcome-stat .v{
+    font-size:12px;
+  }
+}
+@media (max-width: 360px){
+  .outcome-stats{
+    grid-template-columns:1fr;
+  }
+}

@@ -1,0 +1,474 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}THE SAFEST BANK — Transfer Money{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'portal/css/transfer.css' %}">
+<link rel="stylesheet" href="{% static 'portal/css/send_money.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="trust-pulse" id="trustPulse"></div>
+
+<!-- Mobile top header -->
+<div class="mobile-topbar" id="mobileTopbar">
+  <div class="mobile-brand">
+    <img src="{% static 'portal/images/logo.jpeg' %}" alt="The Safest Bank" class="brand-logo-img" style="width:34px;height:34px;">
+    <span>THE SAFEST BANK</span>
+  </div>
+  <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+</div>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<div class="shell">
+  <!-- Sidebar (identical markup/classes to dashboard — not a new design) -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="brand">
+        <img src="{% static 'portal/images/logo.jpeg' %}" alt="The Safest Bank" class="brand-logo-img">
+        <div class="name">THE SAFEST BANK<small>AI-powered protection</small></div>
+      </div>
+      <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="nav-scroll">
+      <div class="nav-label">Main</div>
+      <nav class="nav">
+        <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+          data-tip="Overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="9" rx="1.5" />
+            <rect x="14" y="3" width="7" height="5" rx="1.5" />
+            <rect x="14" y="12" width="7" height="9" rx="1.5" />
+            <rect x="3" y="16" width="7" height="5" rx="1.5" />
+          </svg>
+          <span>Overview</span>
+        </a>
+        <a href="{% url 'transfer' %}" class="{% if request.resolver_match.url_name == 'transfer' %}active{% endif %}"
+          data-tip="Transfers">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 8l4 4-4 4M3 12h18" />
+          </svg>
+          <span>Transfers</span>
+        </a>
+        <a href="{% url 'transactions' %}"
+          class="{% if request.resolver_match.url_name == 'transactions' %}active{% endif %}" data-tip="Transactions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 3h8l3 3v15H7z" />
+            <path d="M10 8h4M10 12h4M10 16h2" />
+          </svg>
+          <span>Transactions</span>
+        </a>
+        <a href="{% url 'accounts' %}" class="{% if request.resolver_match.url_name == 'accounts' %}active{% endif %}"
+          data-tip="Accounts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="17" rx="2" />
+            <path d="M3 9h18M8 4v5M16 4v5" />
+          </svg>
+          <span>Accounts</span>
+        </a>
+        <a href="{% url 'fraud_shield' %}"
+          class="{% if request.resolver_match.url_name == 'fraud_shield' %}active{% endif %}" data-tip="Fraud Shield">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z" />
+          </svg>
+          <span>Fraud Shield</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="profile-block">
+      <div class="avatar">PS</div>
+      <div>
+        <div class="pname">Priya Sharma</div>
+        <div class="prole">Personal Account</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <div class="content-area">
+    <main class="tf-main">
+
+      <div class="tf-header">
+        <h1>Transfer Money</h1>
+        <p>Send money securely with The Safest Bank.</p>
+      </div>
+
+      <!-- Demo scenario selector — temporary, for hackathon demo only.
+           Future integration point: replace this with the real backend
+           response { risk_score, decision, reasons } from Devesh's /score
+           endpoint. See DEMO_SCENARIOS in send_money.js for the exact shape. -->
+      <div class="step-indicator" id="stepIndicator">
+        <div class="step active" data-step="1"><span class="dot">1</span>Details</div>
+        <div class="connector"></div>
+        <div class="step" data-step="2"><span class="dot">2</span>Review</div>
+        <div class="connector"></div>
+        <div class="step" data-step="3"><span class="dot">3</span>Security</div>
+        <div class="connector"></div>
+        <div class="step" data-step="4"><span class="dot">4</span>Done</div>
+      </div>
+
+      <!-- ============ SCREEN 1: INPUT ============ -->
+      <section class="screen active" id="screenInput">
+        <div class="tf-grid">
+          <div class="tf-card">
+            <div class="tf-section">
+              <div class="tf-section-title">Who are you sending money to?</div>
+              <div class="field">
+                <label>Recipient account number</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2.5" />
+                    <path d="M2 10h20" />
+                  </svg>
+                  <input id="tfPayee" placeholder="e.g. 4521 8890 1123" value="4521 8890 1123">
+                </div>
+              </div>
+              <div class="field">
+                <label>Recipient name</label>
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8.5" r="3.5" />
+                    <path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5" />
+                  </svg>
+                  <input id="tfRecipient" placeholder="Full name" value="Rohan Mehta">
+                </div>
+              </div>
+              <div class="verify-check" id="verifyCheck">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+                Recipient verified
+              </div>
+            </div>
+
+            <div class="tf-section">
+              <div class="tf-section-title">How much would you like to send?</div>
+              <div class="field">
+                <label>Amount</label>
+                <div class="amount-row">
+                  <span class="cur">₹</span>
+                  <input id="tfAmount" type="number" value="12500">
+                </div>
+              </div>
+              <div class="balance-line">
+                <span>Available balance</span>
+                <span style="display:flex; align-items:center; gap:6px;">
+                  <span class="bl-val" id="tfBalance" data-value="3,42,180.50" data-hidden="₹ ••••••••••">₹
+                    ••••••••••</span>
+                  <button class="eye-mini" id="tfEyeToggle" aria-label="Show balance">
+                    <svg id="tfEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+                      <circle cx="12" cy="12" r="3" />
+                      <path d="M4 4l16 16" stroke-linecap="round" />
+                    </svg>
+                  </button>
+                </span>
+              </div>
+            </div>
+
+            <div class="tf-section">
+              <label>Add a note (optional)</label>
+              <input id="tfNote" placeholder="e.g. Monthly expenses" value="Monthly expenses">
+            </div>
+
+            <button class="primary" id="continueBtn">
+              <span class="btn-label">Continue →</span>
+              <span class="spinner"></span>
+            </button>
+          </div>
+
+          <div class="tf-card">
+            <div class="summary-title">Transfer summary</div>
+            <div class="summary-row"><span class="k">From Account</span><span class="v">Account •••• 8842</span></div>
+            <div class="summary-row"><span class="k">Recipient</span><span class="v" id="sumRecipient">Rohan
+                Mehta</span></div>
+            <div class="summary-row"><span class="k">Amount</span><span class="v" id="sumAmount">₹12,500</span></div>
+            <div class="summary-row"><span class="k">Transaction Type</span><span class="v">TRANSFER</span></div>
+            <div class="summary-row"><span class="k">Fee</span><span class="v">Free</span></div>
+            <div class="summary-security">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z" />
+                <path d="M9 12l2 2 4-4.5" />
+              </svg>
+              <div>
+                <div class="t">Fraud Shield will screen this transfer</div>
+                <div class="s">Velocity, device, and location checked before funds move.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCREEN 2: REVIEW ============ -->
+      <section class="screen" id="screenReview">
+        <div class="tf-card review-card">
+          <div class="review-title">Review your transfer</div>
+          <div class="review-row"><span class="k">From Account</span><span class="v" id="rvSender">Account •••• 8842</span></div>
+          <div class="review-row"><span class="k">Recipient</span><span class="v" id="rvRecipient">Rohan Mehta</span></div>
+          <div class="review-row"><span class="k">Recipient Account</span><span class="v" id="rvAccount">•••• 1123</span></div>
+          <div class="review-row"><span class="k">Amount</span><span class="v" id="rvAmount">₹12,500</span></div>
+          <div class="review-row"><span class="k">Transaction Type</span><span class="v">TRANSFER</span></div>
+          <div class="review-row"><span class="k">Note</span><span class="v" id="rvNote">Monthly expenses</span></div>
+          <div class="review-actions">
+            <button class="secondary" id="backBtn">Back</button>
+            <button class="primary" id="confirmBtn">
+              <span class="btn-label">Confirm transfer</span>
+              <span class="spinner"></span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCREEN 3: SECURITY CHECK ============ -->
+      <section class="screen" id="screenSecurityCheck">
+        <div class="tf-card sec-check-card">
+          <div class="sec-check-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z" />
+            </svg>
+          </div>
+          <h2>Fraud Shield</h2>
+          <p class="sec-subtitle">AI Fraud Detection in Progress</p>
+          <p>We're analyzing this transaction before processing it.</p>
+
+          <div class="sec-divider"></div>
+          <div class="sec-analyzing-label">Analyzing activity…</div>
+
+          <div class="check-list" id="checkList">
+            <div class="check-item" data-check="device">
+              <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg></span>
+              Checking transaction risk...
+            </div>
+            <div class="check-item" data-check="recipient">
+              <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg></span>
+              Evaluating transaction behavior...
+            </div>
+            <div class="check-item" data-check="amount">
+              <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg></span>
+              Analyzing transaction details...
+            </div>
+          </div>
+
+          <div class="sec-progress-label">Risk assessment</div>
+          <div class="sec-progress">
+            <div class="sec-progress-fill" id="secProgressFill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCREEN 4A: LOW RISK — APPROVED ============ -->
+      <section class="screen" id="screenLowRisk">
+        <div class="tf-card outcome-card">
+          <div class="outcome-icon safe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+          </div>
+          <h2>Transaction Approved</h2>
+          <p class="oc-msg">Fraud Shield found no unusual activity.</p>
+
+          <div class="risk-score-badge safe">
+            <span class="score-num" id="lrScore">3</span><span>/ 100</span>
+            <span class="score-label safe">LOW RISK</span>
+          </div>
+
+          <div class="outcome-stats" style="margin-top:16px;">
+            <div class="outcome-stat">
+              <div class="k">Amount</div>
+              <div class="v" id="lrAmount">₹5,000</div>
+            </div>
+            <div class="outcome-stat">
+              <div class="k">Recipient</div>
+              <div class="v" id="lrRecipient">Test User</div>
+            </div>
+            <div class="outcome-stat">
+              <div class="k">Transaction ID</div>
+              <div class="v" id="lrTxId">TX-9001</div>
+            </div>
+            <div class="outcome-stat">
+              <div class="k">Transaction Type</div>
+              <div class="v">TRANSFER</div>
+            </div>
+            <div class="outcome-stat">
+              <div class="k">Risk Score</div>
+              <div class="v v-safe" id="lrRiskScoreDisplay">3 / 100</div>
+            </div>
+            <div class="outcome-stat">
+              <div class="k">Fraud Probability</div>
+              <div class="v v-safe" id="lrProb">3%</div>
+            </div>
+            <div class="outcome-stat">
+              <div class="k">Status</div>
+              <div class="v v-safe">APPROVED</div>
+            </div>
+            <div class="outcome-stat">
+              <div class="k">Reason</div>
+              <div class="v" id="lrReason">Transaction classified as low risk</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:24px; justify-content:center; width:100%;">
+            <a href="{% url 'transactions' %}" class="btn-link secondary" style="padding:10px 18px; text-decoration:none; border-radius:8px; border:1px solid #cbd5e1; font-weight:600; color:#334155;">View Transactions</a>
+            <a href="{% url 'dashboard' %}" class="btn-link primary" style="padding:10px 18px; text-decoration:none; border-radius:8px; background:#9D174D; color:white; font-weight:600;">Go to Dashboard</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCREEN 4B: HIGH RISK — HELD ============ -->
+      <section class="screen" id="screenHighRisk">
+        <div class="tf-card outcome-card">
+          <div class="outcome-icon blocked">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z" />
+            </svg>
+          </div>
+          <h2 style="color:#b91c1c;">Transaction On Hold</h2>
+          <p class="oc-msg" style="color:#b91c1c; font-weight:600;">This transaction has NOT been completed.</p>
+
+          <div class="risk-score-badge">
+            <span class="score-num" id="hrScore">84.99</span><span>/ 100</span>
+            <span class="score-label">HIGH RISK</span>
+          </div>
+
+          <div class="outcome-stats" style="margin-top:16px;">
+            <div class="outcome-stat">
+              <div class="k">Amount</div>
+              <div class="v" id="hrAmount">₹5,00,000</div>
+            </div>
+            <div class="outcome-stat">
+              <div class="k">Recipient</div>
+              <div class="v" id="hrRecipient">Unknown Recipient</div>
+            </div>
+            <div class="outcome-stat">
+              <div class="k">Transaction ID</div>
+              <div class="v" id="hrTxId">TX-8836</div>
+            </div>
+            <div class="outcome-stat">
+              <div class="k">Decision</div>
+              <div class="v" style="color:#b91c1c; font-weight:700;">QUARANTINE</div>
+            </div>
+            <div class="outcome-stat">
+              <div class="k">Status</div>
+              <div class="v" style="color:#b91c1c; font-weight:700;">ON_HOLD</div>
+            </div>
+            <div class="outcome-stat">
+              <div class="k">Fraud Probability</div>
+              <div class="v" style="color:#b91c1c; font-weight:700;" id="hrProb">84.99%</div>
+            </div>
+            <div class="outcome-stat" style="grid-column: 1 / -1;">
+              <div class="k">Reason</div>
+              <div class="v" id="hrReason" style="color:#b91c1c;">High risk transaction detected</div>
+            </div>
+          </div>
+
+          <div class="reasons-box" style="margin-top:16px;">
+            <div class="rb-title">Risk factors identified</div>
+            <ul class="reasons-list-icon" id="hrReasons">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3l9.5 17H2.5L12 3z" />
+                  <path d="M12 10v4" />
+                  <circle cx="12" cy="17.3" r="0.6" fill="currentColor" stroke="none" />
+                </svg>Unusual transaction velocity</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3l9.5 17H2.5L12 3z" />
+                  <path d="M12 10v4" />
+                  <circle cx="12" cy="17.3" r="0.6" fill="currentColor" stroke="none" />
+                </svg>New device detected</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3l9.5 17H2.5L12 3z" />
+                  <path d="M12 10v4" />
+                  <circle cx="12" cy="17.3" r="0.6" fill="currentColor" stroke="none" />
+                </svg>Recipient differs from usual activity</li>
+            </ul>
+          </div>
+
+          <div class="held-block">
+            <div class="held-pill"><span class="dot"></span>STATUS: ON_HOLD / QUARANTINED</div>
+            <p class="held-title">Funds are secured on hold</p>
+            <p class="held-sub">Your money has NOT left your account. Verification request logged for analyst review.</p>
+          </div>
+
+          <div class="held-actions">
+            <button class="secondary" id="cancelTransferBtn">Cancel transfer</button>
+            <button class="primary" id="verifyMeBtn"><span class="btn-label">Verify it's me →</span><span
+                class="spinner"></span></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCREEN 5: VERIFIED SUCCESS (post-OTP) ============ -->
+      <section class="screen" id="screenVerifiedSuccess">
+        <div class="tf-card outcome-card">
+          <div class="outcome-icon safe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+          </div>
+          <h2>Transaction verified</h2>
+          <p class="oc-msg"><b id="vsAmount">₹12,500</b> to <b id="vsRecipient">Rohan Mehta</b><br>Your identity has
+            been verified and the transaction has been approved.</p>
+          <div class="shield-line">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z" />
+            </svg>
+            Fraud Shield · Protected
+          </div>
+          <button class="primary" id="doneBtn2" style="margin-top:22px;"><span class="btn-label">Done</span><span
+              class="spinner"></span></button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- OTP / Fraud Verification Modal -->
+<div class="overlay" id="otpOverlay">
+  <div class="modal">
+    <h2>Verify your transaction</h2>
+    <p class="sub">For your security, please verify this transaction.</p>
+    <div class="otp-boxes">
+      <input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input
+        maxlength="1">
+    </div>
+    <div class="timer" id="otpTimer">Code expires in 60s</div>
+    <div id="otpDemoHint" style="display:none;margin:8px 0 12px;font-size:12.5px;color:#831843;font-weight:600;"></div>
+    <div style="display:flex; gap:8px;">
+      <button class="secondary" id="otpCancelBtn">Cancel</button>
+      <button class="primary" id="otpVerifyBtn"><span class="btn-label">Verify</span><span
+          class="spinner"></span></button>
+    </div>
+    <div class="otp-shield-footer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 3l7 3v5.5c0 4.6-3.1 8-7 9.5-3.9-1.5-7-4.9-7-9.5V6l7-3z" />
+      </svg>
+      Protected by The Safest Bank Fraud Shield
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="dot"></span><span id="toastMsg">Done</span></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'portal/js/send_money.js' %}"></script>
+{% endblock %}
